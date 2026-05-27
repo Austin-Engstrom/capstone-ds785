@@ -6,11 +6,11 @@ Parse saved Pinkbike review article HTML files and extract structured article da
 This version is tuned using a real Pinkbike article HTML sample.
 """
 
+from locale import currency
 from pathlib import Path
 from typing import Optional
 import json
 import re
-
 import pandas as pd
 from bs4 import BeautifulSoup
 
@@ -39,7 +39,6 @@ def get_json_ld_article(soup: BeautifulSoup) -> dict:
 
     return {}
 
-
 def extract_meta_content(soup: BeautifulSoup, property_name: str) -> Optional[str]:
     """
     Extract content from a meta tag by property name.
@@ -51,7 +50,6 @@ def extract_meta_content(soup: BeautifulSoup, property_name: str) -> Optional[st
         return meta.get("content")
 
     return None
-
 
 def extract_author(article_json: dict) -> Optional[str]:
     """
@@ -67,7 +65,6 @@ def extract_author(article_json: dict) -> Optional[str]:
         return authors.get("name")
 
     return None
-
 
 def extract_retail_price(text: str) -> Optional[str]:
     """
@@ -184,7 +181,6 @@ def clean_article_text(text: str) -> str:
 
     return cleaned_text
 
-
 def extract_article_text(soup: BeautifulSoup) -> str:
     """
     Extract article body text from the Pinkbike blog body container.
@@ -214,7 +210,6 @@ def keyword_score(text: str, keywords: list[str]) -> int:
     """
     return sum(1 for keyword in keywords if keyword in text)
 
-
 def classify_product_category(text: str) -> str:
     """
     Classify high-level product category using scored keyword groups.
@@ -222,46 +217,53 @@ def classify_product_category(text: str) -> str:
 
     text = text.lower()
 
-    category_keywords = {
-        "Bike": [
-            "bike", "frame", "frameset", "hardtail", "trail bike",
-            "enduro bike", "downhill bike", "dh bike", "xc bike",
-            "cross-country bike", "gravel bike", "e-bike", "ebike",
-            "electric mountain bike",
-        ],
-        "Component": [
-            "fork", "shock", "wheel", "wheelset", "tire", "tyre",
-            "brake", "rotor", "drivetrain", "derailleur", "cassette",
-            "chain", "crank", "pedal", "dropper", "seatpost",
-            "handlebar", "stem", "grip", "saddle",
-        ],
-        "Clothing": [
-            "jersey", "pants", "shorts", "glove", "gloves",
-            "shoe", "shoes", "jacket", "bib", "sock", "socks",
-        ],
-        "Protective Gear": [
-            "helmet", "knee pad", "elbow pad", "body armor",
-            "chest protector", "back protector", "goggles",
-            "protection",
-        ],
-        "Accessory": [
-            "pack", "hip pack", "backpack", "tool", "multi-tool",
-            "pump", "light", "computer", "gps", "rack", "bag",
-            "bottle", "cage",
-        ],
-    }
+    protective_keywords = [
+        "helmet", "full face", "full-face", "knee pad", "elbow pad",
+        "body armor", "chest protector", "back protector", "goggles",
+        "protection",
+    ]
 
-    scores = {
-        category: keyword_score(text, keywords)
-        for category, keywords in category_keywords.items()
-    }
+    clothing_keywords = [
+        "jersey", "pants", "shorts", "glove", "gloves",
+        "shoe", "shoes", "jacket", "bib", "sock", "socks",
+    ]
 
-    best_category = max(scores, key=scores.get)
+    bike_keywords = [
+        "bike", "frame", "frameset", "hardtail", "trail bike",
+        "enduro bike", "downhill bike", "dh bike", "xc bike",
+        "cross-country bike", "gravel bike", "e-bike", "ebike",
+        "electric mountain bike",
+    ]
 
-    if scores[best_category] == 0:
-        return "Other"
+    component_keywords = [
+        "fork", "shock", "wheel", "wheelset", "tire", "tyre",
+        "brake", "rotor", "drivetrain", "derailleur", "cassette",
+        "chain", "crank", "pedal", "dropper", "seatpost",
+        "handlebar", "stem", "grip", "saddle",
+    ]
 
-    return best_category
+    accessory_keywords = [
+        "pack", "hip pack", "backpack", "tool", "multi-tool",
+        "pump", "light", "computer", "gps", "rack", "bag",
+        "bottle", "cage",
+    ]
+
+    if any(keyword in text for keyword in protective_keywords):
+        return "Protective Gear"
+
+    if any(keyword in text for keyword in clothing_keywords):
+        return "Clothing"
+
+    if any(keyword in text for keyword in component_keywords):
+        return "Component"
+
+    if any(keyword in text for keyword in bike_keywords):
+        return "Bike"
+
+    if any(keyword in text for keyword in accessory_keywords):
+        return "Accessory"
+
+    return "Other"
 
 def classify_product_subcategory(text: str) -> Optional[str]:
     """
@@ -271,6 +273,13 @@ def classify_product_subcategory(text: str) -> Optional[str]:
     text = text.lower()
 
     subcategory_map = {
+        # Protective Gear
+        "Helmet": ["helmet"],
+        "Knee Pads": ["knee pad", "knee pads"],
+        "Elbow Pads": ["elbow pad", "elbow pads"],
+        "Body Armor": ["body armor", "chest protector", "back protector"],
+        "Goggles": ["goggle", "goggles"],
+
         # Bikes
         "Downhill Bike": ["downhill bike", "dh bike"],
         "Enduro Bike": ["enduro bike", "enduro"],
@@ -303,13 +312,6 @@ def classify_product_subcategory(text: str) -> Optional[str]:
         "Shoes": ["shoe", "shoes"],
         "Jacket": ["jacket"],
         "Socks": ["sock", "socks"],
-
-        # Protective Gear
-        "Helmet": ["helmet"],
-        "Knee Pads": ["knee pad", "knee pads"],
-        "Elbow Pads": ["elbow pad", "elbow pads"],
-        "Body Armor": ["body armor", "chest protector", "back protector"],
-        "Goggles": ["goggle", "goggles"],
 
         # Accessories
         "Pack": ["hip pack", "backpack", "pack"],
@@ -362,9 +364,12 @@ def classify_review_type(text: str) -> str:
 
     return "Unclassified"
 
-def extract_brand(text: str) -> Optional[str]:
+def extract_brand(title: str, article_text: str) -> Optional[str]:
+
     """
-    Extract likely product brand from article title/text using a known brand list.
+    Extract likely product brand from article title/text.
+
+    Prioritizes title matches before article body matches.
     """
 
     brand_keywords = [
@@ -394,53 +399,51 @@ def extract_brand(text: str) -> Optional[str]:
         reverse=True
     )
 
-    for brand in brand_keywords:
-        pattern = rf"\b{re.escape(brand)}\b"
+    # Search title first.
+    for source_text in [title, article_text]:
 
-        if re.search(pattern, text, flags=re.IGNORECASE):
-            return brand
+        if not source_text:
+            continue
+
+        for brand in brand_keywords:
+
+            pattern = rf"\b{re.escape(brand)}\b"
+
+            if re.search(
+                pattern,
+                source_text,
+                flags=re.IGNORECASE
+            ):
+                return brand
 
     return None
 
-def extract_product_name(
-    title: str,
-    brand: Optional[str]
-) -> Optional[str]:
+def extract_product_name(title: str, brand: Optional[str]) -> Optional[str]:
     """
-    Attempt to extract product name from article title.
+    Extract product model name from article title.
 
-    Prototype approach:
-    - remove review-type phrases
-    - remove brand from front of title
-    - clean separators
+    Example:
+    "6D ATB 3: A $769 DH Helmet That Can Be Repaired"
+        -> "ATB 3"
     """
 
     if not title:
         return None
 
-    cleaned = title
+    # Keep only text before subtitle separator.
+    cleaned = title.split(":")[0]
 
-    removal_patterns = [
-        r"review",
-        r"long-term review",
-        r"long term review",
-        r"field test",
-        r"first ride",
-        r"vs\.",
-        r"comparison",
-        r"tested",
-    ]
+    # Remove review wording.
+    cleaned = re.sub(
+        r"\b(review|long-term review|long term review|field test|first ride|tested)\b",
+        "",
+        cleaned,
+        flags=re.IGNORECASE
+    )
 
-    for pattern in removal_patterns:
-        cleaned = re.sub(
-            pattern,
-            "",
-            cleaned,
-            flags=re.IGNORECASE
-        )
-
-    # Remove brand from beginning if found.
+    # Remove brand from beginning.
     if brand:
+
         cleaned = re.sub(
             rf"^{re.escape(brand)}\s+",
             "",
@@ -448,9 +451,8 @@ def extract_product_name(
             flags=re.IGNORECASE
         )
 
-    # Remove common separators.
-    cleaned = re.sub(r"[-:|]+", " ", cleaned)
-
+    # Remove extra separators/spaces.
+    cleaned = re.sub(r"[-–—]+", " ", cleaned)
     cleaned = re.sub(r"\s+", " ", cleaned).strip()
 
     return cleaned if cleaned else None
@@ -487,14 +489,18 @@ def parse_article(html_file: Path) -> dict:
         tags = ", ".join(tags)
 
     article_text = extract_article_text(soup)
-    retail_price = extract_retail_price(article_text)    
-    combined_text = f"{title} {article_text}"
-    product_category = classify_product_category(combined_text)
-    product_subcategory = classify_product_subcategory(combined_text)
-    review_type = classify_review_type(combined_text)
-    brand = extract_brand(combined_text)
+
+    retail_price_raw = extract_retail_price(article_text)
+    retail_price, retail_price_currency = normalize_price(retail_price_raw)
+
+    classification_text = f"{title} {tags} {article_text}"
+
+    brand = extract_brand(title, article_text)
     product_name = extract_product_name(title, brand)
-    normalized_price, currency = normalize_price(retail_price)
+
+    product_category = classify_product_category(classification_text)
+    product_subcategory = classify_product_subcategory(classification_text)
+    review_type = classify_review_type(classification_text)
 
     return {
         "source_file": html_file.name,
@@ -504,16 +510,17 @@ def parse_article(html_file: Path) -> dict:
         "publish_date": publish_date,
         "modified_date": modified_date,
         "tags": tags,
-        "retail_price_raw": retail_price,
-        "retail_price": normalized_price,
-        "currency": currency,
+        "retail_price_raw": retail_price_raw,
+        "retail_price": retail_price,
+        "currency": retail_price_currency,
         "brand": brand,
         "product_name": product_name,
-        "article_text": article_text,
-        "article_text_length": len(article_text),
         "product_category": product_category,
         "product_subcategory": product_subcategory,
-        "review_type": review_type
+        "review_type": review_type,
+        "article_text_length": len(article_text),
+        "article_text": article_text
+
     }
 
 
