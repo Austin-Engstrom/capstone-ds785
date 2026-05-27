@@ -104,6 +104,59 @@ def extract_retail_price(text: str) -> Optional[str]:
 
     return None
 
+def normalize_price(price_text: Optional[str]) -> tuple[Optional[float], Optional[str]]:
+    """
+    Normalize a raw retail price string into numeric value and currency.
+
+    Examples
+    --------
+    "$769 USD" -> 769.0, "USD"
+    "$5,999"   -> 5999.0, None
+    "€399 EUR" -> 399.0, "EUR"
+    """
+
+    if not price_text:
+        return None, None
+
+    currency_symbol_map = {
+        "$": None,
+        "€": "EUR",
+        "£": "GBP",
+    }
+
+    currency_code_pattern = r"\b(USD|CAD|AUD|GBP|EUR)\b"
+    currency_match = re.search(
+        currency_code_pattern,
+        price_text,
+        flags=re.IGNORECASE
+    )
+
+    currency = (
+        currency_match.group(1).upper()
+        if currency_match
+        else None
+    )
+
+    # Infer currency from symbol only when it is unambiguous.
+    if currency is None:
+        for symbol, symbol_currency in currency_symbol_map.items():
+            if symbol in price_text:
+                currency = symbol_currency
+                break
+
+    numeric_match = re.search(
+        r"[\$€£]?\s*([\d,]+(?:\.\d{2})?)",
+        price_text
+    )
+
+    if not numeric_match:
+        return None, currency
+
+    price_value = float(
+        numeric_match.group(1).replace(",", "")
+    )
+
+    return price_value, currency
 
 def clean_article_text(text: str) -> str:
     """
@@ -441,6 +494,7 @@ def parse_article(html_file: Path) -> dict:
     review_type = classify_review_type(combined_text)
     brand = extract_brand(combined_text)
     product_name = extract_product_name(title, brand)
+    normalized_price, currency = normalize_price(retail_price)
 
     return {
         "source_file": html_file.name,
@@ -450,7 +504,9 @@ def parse_article(html_file: Path) -> dict:
         "publish_date": publish_date,
         "modified_date": modified_date,
         "tags": tags,
-        "retail_price": retail_price,
+        "retail_price_raw": retail_price,
+        "retail_price": normalized_price,
+        "currency": currency,
         "brand": brand,
         "product_name": product_name,
         "article_text": article_text,
@@ -499,7 +555,9 @@ def main() -> None:
                 "publish_date",
                 "brand",
                 "product_name",
+                "retail_price_raw",
                 "retail_price",
+                "currency",
                 "product_category",
                 "product_subcategory",
                 "review_type",
