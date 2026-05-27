@@ -155,6 +155,147 @@ def extract_article_text(soup: BeautifulSoup) -> str:
 
     return clean_article_text(article_text)
 
+def classify_product_category(text: str) -> str:
+    """
+    Classify high-level product category.
+    """
+
+    text = text.lower()
+
+    bike_keywords = [
+        "bike",
+        "frame",
+        "ebike",
+        "e-bike",
+        "hardtail",
+        "trail bike",
+        "downhill bike",
+        "enduro bike",
+        "xc bike",
+    ]
+
+    component_keywords = [
+        "fork",
+        "shock",
+        "tire",
+        "wheel",
+        "handlebar",
+        "drivetrain",
+        "brake",
+        "pedal",
+        "dropper",
+        "cassette",
+        "crank",
+        "helmet light",
+    ]
+
+    clothing_keywords = [
+        "helmet",
+        "shoe",
+        "jersey",
+        "pants",
+        "shorts",
+        "glove",
+        "goggle",
+        "jacket",
+        "pack",
+        "protection",
+    ]
+
+    if any(keyword in text for keyword in bike_keywords):
+        return "Bike"
+
+    if any(keyword in text for keyword in component_keywords):
+        return "Component"
+
+    if any(keyword in text for keyword in clothing_keywords):
+        return "Clothing"
+
+    return "Other"
+
+def classify_product_subcategory(text: str) -> Optional[str]:
+    """
+    Classify more detailed product subcategory.
+    """
+
+    text = text.lower()
+
+    subcategory_map = {
+        # Bikes
+        "Hardtail": ["hardtail"],
+        "XC Bike": ["xc bike", "cross country"],
+        "Trail Bike": ["trail bike"],
+        "Enduro Bike": ["enduro"],
+        "Downhill Bike": ["downhill"],
+        "Gravel Bike": ["gravel"],
+        "E-Bike": ["ebike", "e-bike"],
+
+        # Components
+        "Fork": ["fork"],
+        "Shock": ["shock"],
+        "Wheelset": ["wheel"],
+        "Tire": ["tire"],
+        "Brake": ["brake"],
+        "Drivetrain": ["drivetrain", "cassette", "derailleur", "chainring"],
+        "Handlebar": ["handlebar", "bar"],
+        "Pedal": ["pedal"],
+        "Dropper Post": ["dropper"],
+
+        # Clothing / Gear
+        "Helmet": ["helmet"],
+        "Shoe": ["shoe"],
+        "Jersey": ["jersey"],
+        "Pants": ["pants"],
+        "Shorts": ["shorts"],
+        "Gloves": ["glove"],
+        "Goggles": ["goggle"],
+        "Jacket": ["jacket"],
+        "Protection": ["knee pad", "elbow pad", "protection"],
+    }
+
+    for subcategory, keywords in subcategory_map.items():
+        if any(keyword in text for keyword in keywords):
+            return subcategory
+
+    return None
+
+def classify_review_type(text: str) -> Optional[str]:
+    """
+    Classify the type of review article.
+    """
+
+    text = text.lower()
+
+    review_type_map = {
+        "Long-Term Review": [
+            "long-term review",
+            "long term review",
+        ],
+        "Field Test": [
+            "field test",
+        ],
+        "Launch Review": [
+            "first ride",
+            "launch review",
+        ],
+        "Value Comparison": [
+            "value bike",
+            "budget bike",
+            "vs.",
+            "comparison",
+        ],
+        "Product Review": [
+            "review",
+        ],
+    }
+
+    for review_type, keywords in review_type_map.items():
+        if any(keyword in text for keyword in keywords):
+            return review_type
+
+    return None
+
+
 
 def parse_article(html_file: Path) -> dict:
     """
@@ -189,6 +330,12 @@ def parse_article(html_file: Path) -> dict:
 
     article_text = extract_article_text(soup)
     retail_price = extract_retail_price(article_text)
+    
+    combined_text = f"{title} {article_text}"
+
+    product_category = classify_product_category(combined_text)
+    product_subcategory = classify_product_subcategory(combined_text)
+    review_type = classify_review_type(combined_text)
 
     return {
         "source_file": html_file.name,
@@ -201,6 +348,9 @@ def parse_article(html_file: Path) -> dict:
         "retail_price": retail_price,
         "article_text": article_text,
         "article_text_length": len(article_text),
+        "product_category": product_category,
+        "product_subcategory": product_subcategory,
+        "review_type": review_type
     }
 
 
