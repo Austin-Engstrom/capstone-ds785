@@ -21,9 +21,9 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 INPUT_FILE = PROJECT_ROOT / "data" / "processed" / "review_links.csv"
 ARTICLE_HTML_DIR = PROJECT_ROOT / "data" / "raw" / "article_html"
 
-ARTICLE_LIMIT = 5
+ARTICLE_LIMIT = 1
 REQUEST_DELAY_SECONDS = 3
-
+START_INDEX = 1
 
 def make_safe_filename(url: str, index: int) -> str:
     """
@@ -42,7 +42,7 @@ def main() -> None:
     ARTICLE_HTML_DIR.mkdir(parents=True, exist_ok=True)
 
     links_df = pd.read_csv(INPUT_FILE)
-    sample_links = links_df.head(ARTICLE_LIMIT)
+    sample_links = links_df.iloc[START_INDEX:START_INDEX + ARTICLE_LIMIT]
 
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=False)
