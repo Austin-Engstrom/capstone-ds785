@@ -155,102 +155,117 @@ def extract_article_text(soup: BeautifulSoup) -> str:
 
     return clean_article_text(article_text)
 
+def keyword_score(text: str, keywords: list[str]) -> int:
+    """
+    Count how many keywords appear in the text.
+    """
+    return sum(1 for keyword in keywords if keyword in text)
+
+
 def classify_product_category(text: str) -> str:
     """
-    Classify high-level product category.
+    Classify high-level product category using scored keyword groups.
     """
 
     text = text.lower()
 
-    bike_keywords = [
-        "bike",
-        "frame",
-        "ebike",
-        "e-bike",
-        "hardtail",
-        "trail bike",
-        "downhill bike",
-        "enduro bike",
-        "xc bike",
-    ]
+    category_keywords = {
+        "Bike": [
+            "bike", "frame", "frameset", "hardtail", "trail bike",
+            "enduro bike", "downhill bike", "dh bike", "xc bike",
+            "cross-country bike", "gravel bike", "e-bike", "ebike",
+            "electric mountain bike",
+        ],
+        "Component": [
+            "fork", "shock", "wheel", "wheelset", "tire", "tyre",
+            "brake", "rotor", "drivetrain", "derailleur", "cassette",
+            "chain", "crank", "pedal", "dropper", "seatpost",
+            "handlebar", "stem", "grip", "saddle",
+        ],
+        "Clothing": [
+            "jersey", "pants", "shorts", "glove", "gloves",
+            "shoe", "shoes", "jacket", "bib", "sock", "socks",
+        ],
+        "Protective Gear": [
+            "helmet", "knee pad", "elbow pad", "body armor",
+            "chest protector", "back protector", "goggles",
+            "protection",
+        ],
+        "Accessory": [
+            "pack", "hip pack", "backpack", "tool", "multi-tool",
+            "pump", "light", "computer", "gps", "rack", "bag",
+            "bottle", "cage",
+        ],
+    }
 
-    component_keywords = [
-        "fork",
-        "shock",
-        "tire",
-        "wheel",
-        "handlebar",
-        "drivetrain",
-        "brake",
-        "pedal",
-        "dropper",
-        "cassette",
-        "crank",
-        "helmet light",
-    ]
+    scores = {
+        category: keyword_score(text, keywords)
+        for category, keywords in category_keywords.items()
+    }
 
-    clothing_keywords = [
-        "helmet",
-        "shoe",
-        "jersey",
-        "pants",
-        "shorts",
-        "glove",
-        "goggle",
-        "jacket",
-        "pack",
-        "protection",
-    ]
+    best_category = max(scores, key=scores.get)
 
-    if any(keyword in text for keyword in bike_keywords):
-        return "Bike"
+    if scores[best_category] == 0:
+        return "Other"
 
-    if any(keyword in text for keyword in component_keywords):
-        return "Component"
-
-    if any(keyword in text for keyword in clothing_keywords):
-        return "Clothing"
-
-    return "Other"
+    return best_category
 
 def classify_product_subcategory(text: str) -> Optional[str]:
     """
-    Classify more detailed product subcategory.
+    Classify more detailed product subcategory using ordered keyword matching.
     """
 
     text = text.lower()
 
     subcategory_map = {
         # Bikes
-        "Hardtail": ["hardtail"],
-        "XC Bike": ["xc bike", "cross country"],
+        "Downhill Bike": ["downhill bike", "dh bike"],
+        "Enduro Bike": ["enduro bike", "enduro"],
         "Trail Bike": ["trail bike"],
-        "Enduro Bike": ["enduro"],
-        "Downhill Bike": ["downhill"],
-        "Gravel Bike": ["gravel"],
-        "E-Bike": ["ebike", "e-bike"],
+        "XC Bike": ["xc bike", "cross-country bike", "cross country"],
+        "Hardtail": ["hardtail"],
+        "E-Bike": ["e-bike", "ebike", "electric mountain bike"],
+        "Gravel Bike": ["gravel bike", "gravel"],
 
         # Components
-        "Fork": ["fork"],
-        "Shock": ["shock"],
-        "Wheelset": ["wheel"],
-        "Tire": ["tire"],
-        "Brake": ["brake"],
-        "Drivetrain": ["drivetrain", "cassette", "derailleur", "chainring"],
-        "Handlebar": ["handlebar", "bar"],
+        "Suspension Fork": ["suspension fork", "fork"],
+        "Rear Shock": ["rear shock", "shock"],
+        "Wheelset": ["wheelset", "wheels"],
+        "Tire": ["tire", "tyre"],
+        "Brake": ["brake", "rotor"],
+        "Drivetrain": ["drivetrain", "derailleur", "cassette", "chainring", "chain"],
+        "Crankset": ["crankset", "crank"],
         "Pedal": ["pedal"],
-        "Dropper Post": ["dropper"],
+        "Dropper Post": ["dropper", "seatpost"],
+        "Handlebar": ["handlebar", "bar"],
+        "Stem": ["stem"],
+        "Saddle": ["saddle"],
+        "Grip": ["grip"],
 
-        # Clothing / Gear
-        "Helmet": ["helmet"],
-        "Shoe": ["shoe"],
+        # Clothing
         "Jersey": ["jersey"],
         "Pants": ["pants"],
         "Shorts": ["shorts"],
-        "Gloves": ["glove"],
-        "Goggles": ["goggle"],
+        "Gloves": ["glove", "gloves"],
+        "Shoes": ["shoe", "shoes"],
         "Jacket": ["jacket"],
-        "Protection": ["knee pad", "elbow pad", "protection"],
+        "Socks": ["sock", "socks"],
+
+        # Protective Gear
+        "Helmet": ["helmet"],
+        "Knee Pads": ["knee pad", "knee pads"],
+        "Elbow Pads": ["elbow pad", "elbow pads"],
+        "Body Armor": ["body armor", "chest protector", "back protector"],
+        "Goggles": ["goggle", "goggles"],
+
+        # Accessories
+        "Pack": ["hip pack", "backpack", "pack"],
+        "Tool": ["multi-tool", "tool"],
+        "Pump": ["pump"],
+        "Light": ["light"],
+        "Bike Computer": ["computer", "gps"],
+        "Bag": ["bag"],
+        "Bottle Cage": ["bottle cage", "cage"],
     }
 
     for subcategory, keywords in subcategory_map.items():
@@ -259,30 +274,29 @@ def classify_product_subcategory(text: str) -> Optional[str]:
 
     return None
 
-def classify_review_type(text: str) -> Optional[str]:
+def classify_review_type(text: str) -> str:
     """
-    Classify the type of review article.
+    Classify the review/article format.
     """
 
     text = text.lower()
 
     review_type_map = {
         "Long-Term Review": [
-            "long-term review",
-            "long term review",
+            "long-term review", "long term review", "long-term test",
+            "long term test",
         ],
         "Field Test": [
             "field test",
         ],
-        "Launch Review": [
+        "First Ride": [
             "first ride",
-            "launch review",
+        ],
+        "Group Test": [
+            "group test", "roundup", "round-up",
         ],
         "Value Comparison": [
-            "value bike",
-            "budget bike",
-            "vs.",
-            "comparison",
+            "value bike", "budget bike", "comparison", "vs.",
         ],
         "Product Review": [
             "review",
@@ -293,9 +307,100 @@ def classify_review_type(text: str) -> Optional[str]:
         if any(keyword in text for keyword in keywords):
             return review_type
 
+    return "Unclassified"
+
+def extract_brand(text: str) -> Optional[str]:
+    """
+    Extract likely product brand from article title/text using a known brand list.
+    """
+
+    brand_keywords = [
+        # Bikes
+        "Specialized", "Trek", "Santa Cruz", "Yeti", "Pivot", "Norco",
+        "Commencal", "Canyon", "YT", "Giant", "Liv", "Cannondale",
+        "Transition", "Rocky Mountain", "Ibis", "Evil", "Propain",
+        "Orbea", "Scott", "Marin", "Kona", "Devinci", "GT",
+
+        # Components
+        "SRAM", "Shimano", "RockShox", "Fox", "Marzocchi", "Maxxis",
+        "Schwalbe", "Continental", "DT Swiss", "Industry Nine",
+        "Race Face", "OneUp", "Works Components", "PNW", "Hope",
+        "TRP", "Hayes", "Magura", "Burgtec", "Renthal", "Deity",
+
+        # Clothing / protective gear
+        "Troy Lee Designs", "Fox Racing", "Giro", "Bell", "POC",
+        "Smith", "100%", "Leatt", "7mesh", "Endura", "Five Ten",
+        "Ride Concepts", "Rapha", "Pearl Izumi", "Dakine", "ION",
+        "6D",
+    ]
+
+    # Check longer brand names first so "Fox Racing" beats "Fox".
+    brand_keywords = sorted(
+        brand_keywords,
+        key=len,
+        reverse=True
+    )
+
+    for brand in brand_keywords:
+        pattern = rf"\b{re.escape(brand)}\b"
+
+        if re.search(pattern, text, flags=re.IGNORECASE):
+            return brand
+
     return None
 
+def extract_product_name(
+    title: str,
+    brand: Optional[str]
+) -> Optional[str]:
+    """
+    Attempt to extract product name from article title.
 
+    Prototype approach:
+    - remove review-type phrases
+    - remove brand from front of title
+    - clean separators
+    """
+
+    if not title:
+        return None
+
+    cleaned = title
+
+    removal_patterns = [
+        r"review",
+        r"long-term review",
+        r"long term review",
+        r"field test",
+        r"first ride",
+        r"vs\.",
+        r"comparison",
+        r"tested",
+    ]
+
+    for pattern in removal_patterns:
+        cleaned = re.sub(
+            pattern,
+            "",
+            cleaned,
+            flags=re.IGNORECASE
+        )
+
+    # Remove brand from beginning if found.
+    if brand:
+        cleaned = re.sub(
+            rf"^{re.escape(brand)}\s+",
+            "",
+            cleaned,
+            flags=re.IGNORECASE
+        )
+
+    # Remove common separators.
+    cleaned = re.sub(r"[-:|]+", " ", cleaned)
+
+    cleaned = re.sub(r"\s+", " ", cleaned).strip()
+
+    return cleaned if cleaned else None
 
 def parse_article(html_file: Path) -> dict:
     """
@@ -329,13 +434,13 @@ def parse_article(html_file: Path) -> dict:
         tags = ", ".join(tags)
 
     article_text = extract_article_text(soup)
-    retail_price = extract_retail_price(article_text)
-    
+    retail_price = extract_retail_price(article_text)    
     combined_text = f"{title} {article_text}"
-
     product_category = classify_product_category(combined_text)
     product_subcategory = classify_product_subcategory(combined_text)
     review_type = classify_review_type(combined_text)
+    brand = extract_brand(combined_text)
+    product_name = extract_product_name(title, brand)
 
     return {
         "source_file": html_file.name,
@@ -346,6 +451,8 @@ def parse_article(html_file: Path) -> dict:
         "modified_date": modified_date,
         "tags": tags,
         "retail_price": retail_price,
+        "brand": brand,
+        "product_name": product_name,
         "article_text": article_text,
         "article_text_length": len(article_text),
         "product_category": product_category,
@@ -390,7 +497,12 @@ def main() -> None:
                 "title",
                 "author",
                 "publish_date",
+                "brand",
+                "product_name",
                 "retail_price",
+                "product_category",
+                "product_subcategory",
+                "review_type",
                 "article_text_length",
             ]
         ].head()
