@@ -18,7 +18,7 @@ from playwright.sync_api import sync_playwright
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
-INPUT_FILE = PROJECT_ROOT / "data" / "processed" / "review_links.csv"
+INPUT_FILE = PROJECT_ROOT / "data" / "raw" / "review_links" / "review_links.csv"
 ARTICLE_HTML_DIR = PROJECT_ROOT / "data" / "raw" / "article_html"
 
 ARTICLE_LIMIT = 1
