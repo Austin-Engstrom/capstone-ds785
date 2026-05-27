@@ -1,0 +1,16 @@
+# Pinkbike Review Scraper
+
+Prototype web scraper and NLP pipeline for analyzing mountain bike reviews from Pinkbike.
+
+## Goals
+- Collect review metadata
+- Extract article text
+- Analyze sentiment/topics
+- Compare brands/components/categories
+
+## Stack
+- Python
+- BeautifulSoup
+- Pandas
+- VS Code
+- Git/Fork
