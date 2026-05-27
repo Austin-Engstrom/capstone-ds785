@@ -14,8 +14,8 @@ BASE_URL = "https://www.pinkbike.com"
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 INPUT_FILE = PROJECT_ROOT / "data" / "raw" / "html_samples" / "pinkbike_reviews_index_playwright.html"
-OUTPUT_FILE = PROJECT_ROOT / "data" / "processed" / "review_links.csv"
-
+OUTPUT_FILE = PROJECT_ROOT / "data" / "raw" / "review_links" / "review_links.csv"
+OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
 
 def parse_review_links(html_path: Path) -> pd.DataFrame:
     """
