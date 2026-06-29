@@ -1,9 +1,9 @@
 """
-Shared helper functions for the review scraper pipeline.
+Shared helper functions for the Pinkbike review scraper pipeline.
 """
 
 import re
-from urllib.parse import urlsplit, urlunsplit, parse_qsl, urlencode
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 
 def normalize_url(url: str) -> str:
@@ -33,12 +33,16 @@ def normalize_url(url: str) -> str:
     return urlunsplit((scheme, netloc, path, query, ""))
 
 
-def make_safe_filename(url: str, index: int) -> str:
+def make_safe_filename(url: str) -> str:
     """
-    Create a safe local filename from an article URL.
+    Create a safe HTML filename from an article URL.
     """
 
-    slug = url.rstrip("/").split("/")[-1].replace(".html", "")
+    slug = url.rstrip("/").split("/")[-1]
+
+    if slug.endswith(".html"):
+        slug = slug[:-5]
+
     slug = re.sub(r"[^a-zA-Z0-9_-]+", "_", slug)
 
-    return f"{index:03d}_{slug}.html"
+    return f"{slug}.html"
