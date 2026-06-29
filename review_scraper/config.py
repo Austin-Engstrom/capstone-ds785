@@ -43,7 +43,7 @@ PAGE_TIMEOUT_MS = 60000
 PAGE_WAIT_MS = 5000
 
 # Batch settings
-ARTICLE_LIMIT = None
+ARTICLE_LIMIT = 3
 START_INDEX = 0
 
 # Browser settings
