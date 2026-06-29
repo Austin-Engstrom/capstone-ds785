@@ -1,5 +1,5 @@
 """
-Discover Pinkbike review article links and merge them into the existing link CSV.
+Discover Pinkbike review article links and merge them into the master link CSV.
 """
 
 from datetime import datetime
@@ -12,7 +12,8 @@ from playwright.sync_api import sync_playwright
 from review_scraper.config import (
     BASE_URL,
     REVIEWS_INDEX_URL,
-    RAW_REVIEW_LINKS_FILE,
+    REVIEW_LINKS_FILE,
+    DISCOVERY_SOURCE,
     HEADLESS,
     USER_AGENT,
     PAGE_TIMEOUT_MS,
@@ -23,12 +24,11 @@ from review_scraper.utils import normalize_url
 
 
 SCROLL_ATTEMPTS = 10
-DISCOVERY_SOURCE = "pinkbike_reviews_tag"
 
 
 def extract_review_links(html: str) -> pd.DataFrame:
     """
-    Extract candidate Pinkbike review article links from HTML.
+    Extract candidate Pinkbike article links from the loaded reviews page.
     """
 
     soup = BeautifulSoup(html, "lxml")
@@ -51,32 +51,59 @@ def extract_review_links(html: str) -> pd.DataFrame:
                 }
             )
 
+    if not rows:
+        return pd.DataFrame(
+            columns=[
+                "title",
+                "url",
+                "normalized_url",
+                "date_discovered",
+                "source",
+            ]
+        )
+
     return pd.DataFrame(rows).drop_duplicates(subset=["normalized_url"])
 
 
-def merge_with_existing_links(new_links: pd.DataFrame) -> pd.DataFrame:
+def load_existing_links() -> pd.DataFrame:
     """
-    Merge newly discovered links with the existing review links CSV.
+    Load the existing master review link CSV if it exists.
     """
 
-    if RAW_REVIEW_LINKS_FILE.exists():
-        existing_links = pd.read_csv(RAW_REVIEW_LINKS_FILE)
-
-        if "normalized_url" not in existing_links.columns:
-            existing_links["normalized_url"] = existing_links["url"].apply(normalize_url)
-
-        if "date_discovered" not in existing_links.columns:
-            existing_links["date_discovered"] = None
-
-        if "source" not in existing_links.columns:
-            existing_links["source"] = "existing_review_links_csv"
-
-        combined_links = pd.concat(
-            [existing_links, new_links],
-            ignore_index=True,
+    if not REVIEW_LINKS_FILE.exists():
+        return pd.DataFrame(
+            columns=[
+                "title",
+                "url",
+                "normalized_url",
+                "date_discovered",
+                "source",
+            ]
         )
-    else:
-        combined_links = new_links
+
+    existing_links = pd.read_csv(REVIEW_LINKS_FILE)
+
+    if "normalized_url" not in existing_links.columns:
+        existing_links["normalized_url"] = existing_links["url"].apply(normalize_url)
+
+    if "date_discovered" not in existing_links.columns:
+        existing_links["date_discovered"] = None
+
+    if "source" not in existing_links.columns:
+        existing_links["source"] = "existing_review_links_csv"
+
+    return existing_links
+
+
+def merge_links(existing_links: pd.DataFrame, new_links: pd.DataFrame) -> pd.DataFrame:
+    """
+    Combine existing and newly discovered links, then deduplicate.
+    """
+
+    combined_links = pd.concat(
+        [existing_links, new_links],
+        ignore_index=True,
+    )
 
     combined_links = combined_links.drop_duplicates(
         subset=["normalized_url"],
@@ -93,11 +120,14 @@ def merge_with_existing_links(new_links: pd.DataFrame) -> pd.DataFrame:
 
 def main() -> None:
     """
-    Scrape the Pinkbike reviews tag page, append new links to the existing
-    CSV, and remove duplicates.
+    Scrape the Pinkbike reviews tag page, merge new links with existing links,
+    deduplicate, and save the updated master review link file.
     """
 
     create_project_directories()
+
+    existing_links = load_existing_links()
+    existing_count = len(existing_links)
 
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=HEADLESS)
@@ -134,24 +164,27 @@ def main() -> None:
             html = page.content()
             new_links = extract_review_links(html)
 
-            existing_count = 0
-
-            if RAW_REVIEW_LINKS_FILE.exists():
-                existing_count = len(pd.read_csv(RAW_REVIEW_LINKS_FILE))
-
-            combined_links = merge_with_existing_links(new_links)
-
-            RAW_REVIEW_LINKS_FILE.parent.mkdir(parents=True, exist_ok=True)
-            combined_links.to_csv(RAW_REVIEW_LINKS_FILE, index=False)
-
-            print(f"Existing links before run: {existing_count}")
-            print(f"Links found this run: {len(new_links)}")
-            print(f"Total links after dedupe: {len(combined_links)}")
-            print(f"Net new links added: {len(combined_links) - existing_count}")
-            print(f"Saved to: {RAW_REVIEW_LINKS_FILE}")
-
         finally:
             browser.close()
+
+    combined_links = merge_links(existing_links, new_links)
+
+    REVIEW_LINKS_FILE.parent.mkdir(parents=True, exist_ok=True)
+    combined_links.to_csv(REVIEW_LINKS_FILE, index=False)
+
+    new_link_count = len(new_links)
+    total_count = len(combined_links)
+    net_new_count = total_count - existing_count
+    duplicate_count = existing_count + new_link_count - total_count
+
+    print("\nDiscovery summary")
+    print("-----------------")
+    print(f"Existing links:      {existing_count}")
+    print(f"Links discovered:    {new_link_count}")
+    print(f"Duplicates removed:  {duplicate_count}")
+    print(f"Net new links:       {net_new_count}")
+    print(f"Total links:         {total_count}")
+    print(f"Saved to:            {REVIEW_LINKS_FILE}")
 
 
 if __name__ == "__main__":
