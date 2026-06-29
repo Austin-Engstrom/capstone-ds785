@@ -2,10 +2,9 @@
 Scrape Pinkbike review article pages using Playwright.
 
 1. Reads review URLs from data/reference/review_links.csv
-2. Visits either a limited batch or all remaining articles
-3. Saves each raw article HTML file locally
-4. Adds a delay between requests
-5. Stops if a Cloudflare block page is detected
+2. Finds the next missing article HTML file
+3. Saves one raw article HTML file locally per run
+4. Stops if a Cloudflare block page is detected
 """
 
 import time
@@ -18,6 +17,7 @@ from review_scraper.config import (
     ARTICLE_HTML_DIR,
     ARTICLE_LIMIT,
     START_INDEX,
+    SCRAPE_ONE_ARTICLE_PER_RUN,
     REQUEST_DELAY_SECONDS,
     PAGE_TIMEOUT_MS,
     PAGE_WAIT_MS,
@@ -66,9 +66,21 @@ def main() -> None:
 
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=HEADLESS)
+        context = None
 
         try:
-            page = browser.new_page(user_agent=USER_AGENT)
+            context = browser.new_context(
+                user_agent=USER_AGENT,
+                viewport={"width": 1440, "height": 900},
+                locale="en-US",
+                timezone_id="America/Chicago",
+                color_scheme="light",
+                extra_http_headers={
+                    "Accept-Language": "en-US,en;q=0.9",
+                },
+            )
+
+            page = context.new_page()
 
             for index, row in sample_links.iterrows():
                 processed_count += 1
@@ -97,6 +109,10 @@ def main() -> None:
 
                     page.wait_for_timeout(PAGE_WAIT_MS)
 
+                    page.mouse.move(400, 400)
+                    page.mouse.wheel(0, 500)
+                    page.wait_for_timeout(1500)
+
                     html = page.content()
 
                     if is_cloudflare_block(html):
@@ -111,6 +127,10 @@ def main() -> None:
                     print(f"[SAVE] {output_file.name}")
                     print(f"HTML size: {len(html):,} characters")
 
+                    if SCRAPE_ONE_ARTICLE_PER_RUN:
+                        print("One-article-per-run mode enabled. Exiting.")
+                        break
+
                 except Exception as error:
                     failed_count += 1
                     print(f"[FAIL] {url}")
@@ -119,6 +139,9 @@ def main() -> None:
                 time.sleep(REQUEST_DELAY_SECONDS)
 
         finally:
+            if context is not None:
+                context.close()
+
             browser.close()
 
     print("\nScrape summary")
