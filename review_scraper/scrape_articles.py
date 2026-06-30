@@ -1,0 +1,156 @@
+"""
+Scrape Pinkbike review article pages using Playwright.
+
+1. Reads review URLs from data/reference/review_links.csv
+2. Finds the next missing article HTML file
+3. Saves one raw article HTML file locally per run
+4. Stops if a Cloudflare block page is detected
+"""
+
+import time
+
+import pandas as pd
+from playwright.sync_api import sync_playwright
+
+from review_scraper.config import (
+    REVIEW_LINKS_FILE,
+    ARTICLE_HTML_DIR,
+    ARTICLE_LIMIT,
+    START_INDEX,
+    SCRAPE_ONE_ARTICLE_PER_RUN,
+    REQUEST_DELAY_SECONDS,
+    PAGE_TIMEOUT_MS,
+    PAGE_WAIT_MS,
+    HEADLESS,
+    USER_AGENT,
+    create_project_directories,
+)
+from review_scraper.utils import make_safe_filename
+
+
+INPUT_FILE = REVIEW_LINKS_FILE
+
+
+def is_cloudflare_block(html: str) -> bool:
+    """
+    Detect whether the downloaded HTML is a Cloudflare block page.
+    """
+
+    block_indicators = [
+        "Attention Required! | Cloudflare",
+        "Sorry, you have been blocked",
+        "cf-error-details",
+    ]
+
+    return any(indicator in html for indicator in block_indicators)
+
+
+def main() -> None:
+    """
+    Visit review URLs and save raw HTML.
+    """
+
+    create_project_directories()
+
+    links_df = pd.read_csv(INPUT_FILE)
+
+    if ARTICLE_LIMIT is None:
+        sample_links = links_df.iloc[START_INDEX:]
+    else:
+        sample_links = links_df.iloc[START_INDEX:START_INDEX + ARTICLE_LIMIT]
+
+    processed_count = 0
+    downloaded_count = 0
+    skipped_count = 0
+    failed_count = 0
+
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=HEADLESS)
+        context = None
+
+        try:
+            context = browser.new_context(
+                user_agent=USER_AGENT,
+                viewport={"width": 1440, "height": 900},
+                locale="en-US",
+                timezone_id="America/Chicago",
+                color_scheme="light",
+                extra_http_headers={
+                    "Accept-Language": "en-US,en;q=0.9",
+                },
+            )
+
+            page = context.new_page()
+
+            for index, row in sample_links.iterrows():
+                processed_count += 1
+
+                url = (
+                    row["normalized_url"]
+                    if "normalized_url" in row and pd.notna(row["normalized_url"])
+                    else row["url"]
+                )
+
+                output_file = ARTICLE_HTML_DIR / make_safe_filename(url)
+
+                if output_file.exists():
+                    skipped_count += 1
+                    print(f"[SKIP] {output_file.name}")
+                    continue
+
+                print(f"[SCRAPE] {index + 1}: {url}")
+
+                try:
+                    page.goto(
+                        url,
+                        wait_until="domcontentloaded",
+                        timeout=PAGE_TIMEOUT_MS,
+                    )
+
+                    page.wait_for_timeout(PAGE_WAIT_MS)
+
+                    page.mouse.move(400, 400)
+                    page.mouse.wheel(0, 500)
+                    page.wait_for_timeout(1500)
+
+                    html = page.content()
+
+                    if is_cloudflare_block(html):
+                        failed_count += 1
+                        print(f"[BLOCKED] {url}")
+                        print("Cloudflare block detected. Ending scrape.")
+                        break
+
+                    output_file.write_text(html, encoding="utf-8")
+
+                    downloaded_count += 1
+                    print(f"[SAVE] {output_file.name}")
+                    print(f"HTML size: {len(html):,} characters")
+
+                    if SCRAPE_ONE_ARTICLE_PER_RUN:
+                        print("One-article-per-run mode enabled. Exiting.")
+                        break
+
+                except Exception as error:
+                    failed_count += 1
+                    print(f"[FAIL] {url}")
+                    print(f"Error: {error}")
+
+                time.sleep(REQUEST_DELAY_SECONDS)
+
+        finally:
+            if context is not None:
+                context.close()
+
+            browser.close()
+
+    print("\nScrape summary")
+    print("--------------")
+    print(f"Articles processed: {processed_count}")
+    print(f"Downloaded:         {downloaded_count}")
+    print(f"Skipped:            {skipped_count}")
+    print(f"Failed:             {failed_count}")
+
+
+if __name__ == "__main__":
+    main()
