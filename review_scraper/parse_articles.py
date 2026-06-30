@@ -1,29 +1,54 @@
 """
-parse_articles.py
-
 Parse saved Pinkbike review article HTML files and extract structured article data.
-
-This version is tuned using a real Pinkbike article HTML sample.
 """
 
-from locale import currency
 from pathlib import Path
 from typing import Optional
 import json
 import re
+
 import pandas as pd
 from bs4 import BeautifulSoup
 
+from review_scraper.config import (
+    ARTICLE_HTML_DIR,
+    REVIEWS_DATASET_FILE,
+    BRAND_REFERENCE_FILE,
+    create_project_directories,
+)
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
-ARTICLE_HTML_DIR = PROJECT_ROOT / "data" / "raw" / "article_html"
-OUTPUT_FILE = PROJECT_ROOT / "data" / "processed" / "parsed_articles.csv"
+OUTPUT_FILE = REVIEWS_DATASET_FILE
+
+def load_brand_reference() -> pd.DataFrame:
+    """
+    Load the active brand reference table.
+    """
+
+    brand_reference = pd.read_csv(BRAND_REFERENCE_FILE)
+
+    # Keep only active brands
+    brand_reference = brand_reference[
+        brand_reference["active"].astype(str).str.upper() == "TRUE"
+    ].copy()
+
+    # Longest aliases first, then highest priority
+    brand_reference["alias_length"] = brand_reference["alias"].str.len()
+
+    brand_reference = brand_reference.sort_values(
+        by=["priority", "alias_length"],
+        ascending=[False, False],
+    )
+
+    return brand_reference
+
+BRAND_REFERENCE = load_brand_reference()
 
 
 def get_json_ld_article(soup: BeautifulSoup) -> dict:
     """
     Extract the NewsArticle JSON-LD object when available.
+    Handles both dictionary and list JSON-LD structures.
     """
 
     for script in soup.find_all("script", type="application/ld+json"):
@@ -34,8 +59,14 @@ def get_json_ld_article(soup: BeautifulSoup) -> dict:
         except json.JSONDecodeError:
             continue
 
-        if data.get("@type") == "NewsArticle":
-            return data
+        if isinstance(data, dict):
+            if data.get("@type") == "NewsArticle":
+                return data
+
+        elif isinstance(data, list):
+            for item in data:
+                if isinstance(item, dict) and item.get("@type") == "NewsArticle":
+                    return item
 
     return {}
 
@@ -50,6 +81,7 @@ def extract_meta_content(soup: BeautifulSoup, property_name: str) -> Optional[st
         return meta.get("content")
 
     return None
+
 
 def extract_author(article_json: dict) -> Optional[str]:
     """
@@ -66,14 +98,10 @@ def extract_author(article_json: dict) -> Optional[str]:
 
     return None
 
+
 def extract_retail_price(text: str) -> Optional[str]:
     """
     Extract likely product retail price from article text.
-
-    Prioritizes explicit labels like:
-    - Price: $769 USD
-    - MSRP: $5,999
-    - Retail Price: $4,499
     """
 
     labeled_price_pattern = (
@@ -84,7 +112,7 @@ def extract_retail_price(text: str) -> Optional[str]:
     labeled_match = re.search(
         labeled_price_pattern,
         text,
-        flags=re.IGNORECASE
+        flags=re.IGNORECASE,
     )
 
     if labeled_match:
@@ -93,7 +121,7 @@ def extract_retail_price(text: str) -> Optional[str]:
     fallback_match = re.search(
         r"(\$[\d,]+(?:\.\d{2})?\s*(?:USD|CAD|AUD|GBP|EUR)?)",
         text,
-        flags=re.IGNORECASE
+        flags=re.IGNORECASE,
     )
 
     if fallback_match:
@@ -101,15 +129,10 @@ def extract_retail_price(text: str) -> Optional[str]:
 
     return None
 
+
 def normalize_price(price_text: Optional[str]) -> tuple[Optional[float], Optional[str]]:
     """
     Normalize a raw retail price string into numeric value and currency.
-
-    Examples
-    --------
-    "$769 USD" -> 769.0, "USD"
-    "$5,999"   -> 5999.0, None
-    "€399 EUR" -> 399.0, "EUR"
     """
 
     if not price_text:
@@ -122,19 +145,15 @@ def normalize_price(price_text: Optional[str]) -> tuple[Optional[float], Optiona
     }
 
     currency_code_pattern = r"\b(USD|CAD|AUD|GBP|EUR)\b"
+
     currency_match = re.search(
         currency_code_pattern,
         price_text,
-        flags=re.IGNORECASE
+        flags=re.IGNORECASE,
     )
 
-    currency = (
-        currency_match.group(1).upper()
-        if currency_match
-        else None
-    )
+    currency = currency_match.group(1).upper() if currency_match else None
 
-    # Infer currency from symbol only when it is unambiguous.
     if currency is None:
         for symbol, symbol_currency in currency_symbol_map.items():
             if symbol in price_text:
@@ -143,17 +162,16 @@ def normalize_price(price_text: Optional[str]) -> tuple[Optional[float], Optiona
 
     numeric_match = re.search(
         r"[\$€£]?\s*([\d,]+(?:\.\d{2})?)",
-        price_text
+        price_text,
     )
 
     if not numeric_match:
         return None, currency
 
-    price_value = float(
-        numeric_match.group(1).replace(",", "")
-    )
+    price_value = float(numeric_match.group(1).replace(",", ""))
 
     return price_value, currency
+
 
 def clean_article_text(text: str) -> str:
     """
@@ -174,12 +192,13 @@ def clean_article_text(text: str) -> str:
             pattern,
             " ",
             cleaned_text,
-            flags=re.IGNORECASE
+            flags=re.IGNORECASE,
         )
 
     cleaned_text = re.sub(r"\s+", " ", cleaned_text).strip()
 
     return cleaned_text
+
 
 def extract_article_text(soup: BeautifulSoup) -> str:
     """
@@ -194,7 +213,6 @@ def extract_article_text(soup: BeautifulSoup) -> str:
     if body is None:
         return ""
 
-    # Remove scripts, styles, videos, comments, and obvious non-article containers.
     for element in body.select(
         "script, style, iframe, video, .news-comments, .commentslist, #comment_wrap"
     ):
@@ -204,15 +222,18 @@ def extract_article_text(soup: BeautifulSoup) -> str:
 
     return clean_article_text(article_text)
 
+
 def keyword_score(text: str, keywords: list[str]) -> int:
     """
     Count how many keywords appear in the text.
     """
+
     return sum(1 for keyword in keywords if keyword in text)
+
 
 def classify_product_category(text: str) -> str:
     """
-    Classify high-level product category using scored keyword groups.
+    Classify high-level product category using keyword groups.
     """
 
     text = text.lower()
@@ -265,22 +286,21 @@ def classify_product_category(text: str) -> str:
 
     return "Other"
 
+
 def classify_product_subcategory(text: str) -> Optional[str]:
     """
-    Classify more detailed product subcategory using ordered keyword matching.
+    Classify detailed product subcategory using ordered keyword matching.
     """
 
     text = text.lower()
 
     subcategory_map = {
-        # Protective Gear
         "Helmet": ["helmet"],
         "Knee Pads": ["knee pad", "knee pads"],
         "Elbow Pads": ["elbow pad", "elbow pads"],
         "Body Armor": ["body armor", "chest protector", "back protector"],
         "Goggles": ["goggle", "goggles"],
 
-        # Bikes
         "Downhill Bike": ["downhill bike", "dh bike"],
         "Enduro Bike": ["enduro bike", "enduro"],
         "Trail Bike": ["trail bike"],
@@ -289,7 +309,6 @@ def classify_product_subcategory(text: str) -> Optional[str]:
         "E-Bike": ["e-bike", "ebike", "electric mountain bike"],
         "Gravel Bike": ["gravel bike", "gravel"],
 
-        # Components
         "Suspension Fork": ["suspension fork", "fork"],
         "Rear Shock": ["rear shock", "shock"],
         "Wheelset": ["wheelset", "wheels"],
@@ -304,7 +323,6 @@ def classify_product_subcategory(text: str) -> Optional[str]:
         "Saddle": ["saddle"],
         "Grip": ["grip"],
 
-        # Clothing
         "Jersey": ["jersey"],
         "Pants": ["pants"],
         "Shorts": ["shorts"],
@@ -313,7 +331,6 @@ def classify_product_subcategory(text: str) -> Optional[str]:
         "Jacket": ["jacket"],
         "Socks": ["sock", "socks"],
 
-        # Accessories
         "Pack": ["hip pack", "backpack", "pack"],
         "Tool": ["multi-tool", "tool"],
         "Pump": ["pump"],
@@ -328,6 +345,7 @@ def classify_product_subcategory(text: str) -> Optional[str]:
             return subcategory
 
     return None
+
 
 def classify_review_type(text: str) -> str:
     """
@@ -364,98 +382,59 @@ def classify_review_type(text: str) -> str:
 
     return "Unclassified"
 
-def extract_brand(title: str, article_text: str) -> Optional[str]:
 
+def load_brand_reference() -> pd.DataFrame:
     """
-    Extract likely product brand from article title/text.
-
-    Prioritizes title matches before article body matches.
+    Load the active brand reference table.
     """
 
-    brand_keywords = [
-        # Bikes
-        "Specialized", "Trek", "Santa Cruz", "Yeti", "Pivot", "Norco",
-        "Commencal", "Canyon", "YT", "Giant", "Liv", "Cannondale",
-        "Transition", "Rocky Mountain", "Ibis", "Evil", "Propain",
-        "Orbea", "Scott", "Marin", "Kona", "Devinci", "GT",
+    brand_reference = pd.read_csv(BRAND_REFERENCE_FILE)
 
-        # Components
-        "SRAM", "Shimano", "RockShox", "Fox", "Marzocchi", "Maxxis",
-        "Schwalbe", "Continental", "DT Swiss", "Industry Nine",
-        "Race Face", "OneUp", "Works Components", "PNW", "Hope",
-        "TRP", "Hayes", "Magura", "Burgtec", "Renthal", "Deity",
+    # Keep only active brands
+    brand_reference = brand_reference[
+        brand_reference["active"].astype(str).str.upper() == "TRUE"
+    ].copy()
 
-        # Clothing / protective gear
-        "Troy Lee Designs", "Fox Racing", "Giro", "Bell", "POC",
-        "Smith", "100%", "Leatt", "7mesh", "Endura", "Five Ten",
-        "Ride Concepts", "Rapha", "Pearl Izumi", "Dakine", "ION",
-        "6D",
-    ]
+    # Longest highest priority, then alias length
+    brand_reference["alias_length"] = brand_reference["alias"].str.len()
 
-    # Check longer brand names first so "Fox Racing" beats "Fox".
-    brand_keywords = sorted(
-        brand_keywords,
-        key=len,
-        reverse=True
+    brand_reference = brand_reference.sort_values(
+        by=["priority", "alias_length"],
+        ascending=[False, False],
     )
 
-    # Search title first.
-    for source_text in [title, article_text]:
+    return brand_reference
 
-        if not source_text:
-            continue
-
-        for brand in brand_keywords:
-
-            pattern = rf"\b{re.escape(brand)}\b"
-
-            if re.search(
-                pattern,
-                source_text,
-                flags=re.IGNORECASE
-            ):
-                return brand
-
-    return None
-
-def extract_product_name(title: str, brand: Optional[str]) -> Optional[str]:
+def extract_product_name(title: Optional[str], brand: Optional[str]) -> Optional[str]:
     """
     Extract product model name from article title.
-
-    Example:
-    "6D ATB 3: A $769 DH Helmet That Can Be Repaired"
-        -> "ATB 3"
     """
 
     if not title:
         return None
 
-    # Keep only text before subtitle separator.
     cleaned = title.split(":")[0]
 
-    # Remove review wording.
     cleaned = re.sub(
         r"\b(review|long-term review|long term review|field test|first ride|tested)\b",
         "",
         cleaned,
-        flags=re.IGNORECASE
+        flags=re.IGNORECASE,
     )
 
-    # Remove brand from beginning.
     if brand:
-
         cleaned = re.sub(
             rf"^{re.escape(brand)}\s+",
             "",
             cleaned,
-            flags=re.IGNORECASE
+            flags=re.IGNORECASE,
         )
 
-    # Remove extra separators/spaces.
     cleaned = re.sub(r"[-–—]+", " ", cleaned)
     cleaned = re.sub(r"\s+", " ", cleaned).strip()
 
     return cleaned if cleaned else None
+
 
 def parse_article(html_file: Path) -> dict:
     """
@@ -519,8 +498,7 @@ def parse_article(html_file: Path) -> dict:
         "product_subcategory": product_subcategory,
         "review_type": review_type,
         "article_text_length": len(article_text),
-        "article_text": article_text
-
+        "article_text": article_text,
     }
 
 
@@ -528,6 +506,8 @@ def main() -> None:
     """
     Parse all saved article HTML files.
     """
+
+    create_project_directories()
 
     rows = []
 
@@ -553,25 +533,26 @@ def main() -> None:
     print(f"\nSaved parsed dataset to:")
     print(OUTPUT_FILE)
 
-    print("\nPreview:")
-    print(
-        df[
-            [
-                "title",
-                "author",
-                "publish_date",
-                "brand",
-                "product_name",
-                "retail_price_raw",
-                "retail_price",
-                "currency",
-                "product_category",
-                "product_subcategory",
-                "review_type",
-                "article_text_length",
-            ]
-        ].head()
-    )
+    if not df.empty:
+        print("\nPreview:")
+        print(
+            df[
+                [
+                    "title",
+                    "author",
+                    "publish_date",
+                    "brand",
+                    "product_name",
+                    "retail_price_raw",
+                    "retail_price",
+                    "currency",
+                    "product_category",
+                    "product_subcategory",
+                    "review_type",
+                    "article_text_length",
+                ]
+            ].head()
+        )
 
 
 if __name__ == "__main__":
