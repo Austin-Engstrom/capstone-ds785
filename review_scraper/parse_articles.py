@@ -383,27 +383,25 @@ def classify_review_type(text: str) -> str:
     return "Unclassified"
 
 
-def load_brand_reference() -> pd.DataFrame:
+def extract_brand(title: Optional[str], article_text: str) -> Optional[str]:
     """
-    Load the active brand reference table.
+    Extract the product brand using the brand reference table.
     """
 
-    brand_reference = pd.read_csv(BRAND_REFERENCE_FILE)
+    for source_text in [title, article_text]:
+        if not source_text:
+            continue
 
-    # Keep only active brands
-    brand_reference = brand_reference[
-        brand_reference["active"].astype(str).str.upper() == "TRUE"
-    ].copy()
+        for _, row in BRAND_REFERENCE.iterrows():
+            alias = row["alias"]
+            brand_name = row["brand_name"]
 
-    # Longest highest priority, then alias length
-    brand_reference["alias_length"] = brand_reference["alias"].str.len()
+            pattern = rf"\b{re.escape(alias)}\b"
 
-    brand_reference = brand_reference.sort_values(
-        by=["priority", "alias_length"],
-        ascending=[False, False],
-    )
+            if re.search(pattern, source_text, flags=re.IGNORECASE):
+                return brand_name
 
-    return brand_reference
+    return None
 
 def extract_product_name(title: Optional[str], brand: Optional[str]) -> Optional[str]:
     """
