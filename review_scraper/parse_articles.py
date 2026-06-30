@@ -1,7 +1,21 @@
 """
 Parse saved Pinkbike review article HTML files and extract structured article data.
-"""
 
+Purpose:
+This script supports the cleaning and preprocessing stage of the project.
+It converts raw saved Pinkbike article HTML files into a structured CSV
+dataset that can be used for later sentiment analysis and NLP modeling.
+
+Main tasks:
+1. Load saved article HTML files.
+2. Extract article metadata such as title, author, publish date, URL, and tags.
+3. Extract and clean article body text.
+4. Extract product attributes such as brand, product name, retail price, product category, product subcategory, and review type.
+5. Save the structured review-level dataset to data/processed.
+
+AI Use:
+AI tools were used to assist with code review, debugging, function design, extraction logic, and annotation.
+"""
 from pathlib import Path
 from typing import Optional
 import json
@@ -19,6 +33,13 @@ from review_scraper.config import (
 
 
 OUTPUT_FILE = REVIEWS_DATASET_FILE
+
+"""
+Brand reference loading
+The brand reference CSV allows brand extraction to use a controlled
+reference table instead of relying only on hard-coded brand names.
+This makes the parser easier to update as new brands or aliases are found.
+"""
 
 def load_brand_reference() -> pd.DataFrame:
     """
@@ -44,6 +65,12 @@ def load_brand_reference() -> pd.DataFrame:
 
 BRAND_REFERENCE = load_brand_reference()
 
+"""
+Metadata extraction helpers
+These functions extract structured article metadata from JSON-LD and
+HTML meta tags when available. JSON-LD is preferred because it usually
+contains cleaner article-level information than visible page text.
+"""
 
 def get_json_ld_article(soup: BeautifulSoup) -> dict:
     """
@@ -98,6 +125,11 @@ def extract_author(article_json: dict) -> Optional[str]:
 
     return None
 
+"""
+Price extraction and normalization
+These functions identify raw price text from the article body and convert
+it into a numeric price and currency field for later analysis.
+"""
 
 def extract_retail_price(text: str) -> Optional[str]:
     """
@@ -172,6 +204,12 @@ def normalize_price(price_text: Optional[str]) -> tuple[Optional[float], Optiona
 
     return price_value, currency
 
+"""
+Article text extraction and cleaning
+These functions isolate the main Pinkbike article body and remove common
+page noise such as embedded video controls, comments, scripts, and style
+elements.
+"""
 
 def clean_article_text(text: str) -> str:
     """
@@ -230,6 +268,12 @@ def keyword_score(text: str, keywords: list[str]) -> int:
 
     return sum(1 for keyword in keywords if keyword in text)
 
+"""
+Product classification helpers
+These functions use rule-based keyword matching to classify each review
+into a high-level product category, detailed subcategory, and review type.
+This gives the project structured fields for exploratory analysis before the NLP modeling stage.
+"""
 
 def classify_product_category(text: str) -> str:
     """
@@ -285,7 +329,6 @@ def classify_product_category(text: str) -> str:
         return "Accessory"
 
     return "Other"
-
 
 def classify_product_subcategory(text: str) -> Optional[str]:
     """
@@ -382,6 +425,12 @@ def classify_review_type(text: str) -> str:
 
     return "Unclassified"
 
+"""
+Brand and product name extraction
+These functions extract the likely product brand and model name. Brand
+matching uses the active brand reference table, while product name
+extraction cleans the article title after removing review-related wording.
+"""
 
 def extract_brand(title: Optional[str], article_text: str) -> Optional[str]:
     """
@@ -433,6 +482,11 @@ def extract_product_name(title: Optional[str], brand: Optional[str]) -> Optional
 
     return cleaned if cleaned else None
 
+"""
+Single-article parser
+This function combines metadata extraction, text cleaning, price parsing,
+brand extraction, and product classification into one structured record.
+"""
 
 def parse_article(html_file: Path) -> dict:
     """
@@ -499,6 +553,12 @@ def parse_article(html_file: Path) -> dict:
         "article_text": article_text,
     }
 
+"""
+Batch parser entry point
+Unlike the scraper, this parser intentionally processes all saved HTML
+files. The scraper collects articles cautiously one at a time, but once
+files are saved locally, parsing all available files is safe and repeatable.
+"""
 
 def main() -> None:
     """
