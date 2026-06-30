@@ -23,7 +23,7 @@ REVIEW_LINKS_FILE = REFERENCE_DIR / "review_links.csv"
 BRAND_REFERENCE_FILE = REFERENCE_DIR / "brand_reference.csv"
 
 # Processed datasets
-PARSED_ARTICLES_FILE = PROCESSED_DIR / "pinkbike_reviews.csv"
+REVIEWS_DATASET_FILE = PROCESSED_DIR / "pinkbike_reviews.csv"
 
 # QA outputs
 FAILED_URLS_FILE = QA_DIR / "failed_urls.csv"
