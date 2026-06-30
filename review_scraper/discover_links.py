@@ -1,5 +1,19 @@
 """
 Discover Pinkbike review article links and merge them into the master link CSV.
+
+Purpose:
+This script supports the data collection stage of the project. It visits the
+Pinkbike reviews tag page, scrolls the page to load article links, extracts
+candidate review article URLs, removes duplicates, and saves the updated
+master list of review links. This allows for new articles to be discovered and added to the dataset over time.
+
+The resulting review_links.csv file is used by scrape_articles.py to download
+individual article HTML files.
+
+AI Use:
+AI tools were used to assist with code review, debugging, organization,
+and annotation. All code and comments were reviewed by the student before
+submission.
 """
 
 from datetime import datetime
@@ -23,12 +37,17 @@ from review_scraper.config import (
 from review_scraper.utils import normalize_url
 
 
+# Number of times to scroll the Pinkbike reviews page to load more links.
 SCROLL_ATTEMPTS = 10
 
 
 def extract_review_links(html: str) -> pd.DataFrame:
     """
-    Extract candidate Pinkbike article links from the loaded reviews page.
+    Extract candidate Pinkbike review article links from page HTML.
+
+    The function searches all anchor tags, keeps links that appear to be
+    Pinkbike news articles, converts relative URLs into full URLs, and adds
+    metadata for traceability.
     """
 
     soup = BeautifulSoup(html, "lxml")
@@ -37,7 +56,10 @@ def extract_review_links(html: str) -> pd.DataFrame:
     for link in soup.find_all("a", href=True):
         href = link["href"]
         title = link.get_text(" ", strip=True)
-
+        """
+        Pinkbike article links are stored under /news/ and end in .html.
+        A non-empty title is required so each URL has useful context.
+        """
         if "/news/" in href and href.endswith(".html") and title:
             url = urljoin(BASE_URL, href)
 
@@ -62,12 +84,17 @@ def extract_review_links(html: str) -> pd.DataFrame:
             ]
         )
 
+    # Deduplicate links found during this discovery run.
     return pd.DataFrame(rows).drop_duplicates(subset=["normalized_url"])
 
 
 def load_existing_links() -> pd.DataFrame:
     """
     Load the existing master review link CSV if it exists.
+
+    If the file does not exist yet, an empty DataFrame with the expected
+    schema is returned. The function also backfills expected columns so older
+    link files remain compatible with the current pipeline.
     """
 
     if not REVIEW_LINKS_FILE.exists():
@@ -98,6 +125,9 @@ def load_existing_links() -> pd.DataFrame:
 def merge_links(existing_links: pd.DataFrame, new_links: pd.DataFrame) -> pd.DataFrame:
     """
     Combine existing and newly discovered links, then deduplicate.
+
+    Deduplication is based on normalized_url so the same article is not stored
+    multiple times if it appears with minor URL differences.
     """
 
     combined_links = pd.concat(
@@ -120,8 +150,7 @@ def merge_links(existing_links: pd.DataFrame, new_links: pd.DataFrame) -> pd.Dat
 
 def main() -> None:
     """
-    Scrape the Pinkbike reviews tag page, merge new links with existing links,
-    deduplicate, and save the updated master review link file.
+    Discover Pinkbike review article links and update the master link file.
     """
 
     create_project_directories()
@@ -146,7 +175,10 @@ def main() -> None:
             page.wait_for_timeout(PAGE_WAIT_MS)
 
             previous_height = 0
-
+            """
+            Scroll the reviews page so dynamically loaded article links
+            have a chance to appear in the final page HTML.
+            """
             for attempt in range(1, SCROLL_ATTEMPTS + 1):
                 print(f"Scroll attempt {attempt}")
 
