@@ -85,19 +85,14 @@ request delay and timeout settings are intentionally conservative to
 reduce scraping failures and avoid making rapid requests to the site.
 """
 HEADLESS = False
-REQUEST_DELAY_SECONDS = 60
 PAGE_TIMEOUT_MS = 60000
 PAGE_WAIT_MS = 10000
 
 """
 Batch processing settings
-ARTICLE_LIMIT can be used to limit the number of articles processed
-during testing. START_INDEX allows scraping to resume from a later point.
-SCRAPE_ONE_ARTICLE_PER_RUN supports cautious incremental scraping.
+START_INDEX allows scraping to resume from a later point.
 """
-ARTICLE_LIMIT = None
 START_INDEX = 0
-SCRAPE_ONE_ARTICLE_PER_RUN = True
 
 """
 Browser identity settings
