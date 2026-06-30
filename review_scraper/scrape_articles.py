@@ -1,13 +1,20 @@
 """
-Scrape Pinkbike review article pages using Playwright.
+Scrape one Pinkbike review article page using Playwright.
 
-1. Reads review URLs from data/reference/review_links.csv
-2. Finds the next missing article HTML file
-3. Saves one raw article HTML file locally per run
-4. Stops if a Cloudflare block page is detected
+Purpose:
+This script supports the data collection stage of the project. It reads
+the discovered Pinkbike review URLs, identifies the next article that has
+not already been saved, downloads that article's raw HTML, and stores it
+locally for later parsing and preprocessing.
+
+The scraper intentionally processes one article per run. This conservative
+approach reduces scraping risk, makes failures easier to inspect, and helps
+avoid repeatedly requesting many pages from Pinkbike in a short time.
+
+AI Use:
+AI tools were used to assist with code review, debugging, simplification,
+and annotation.
 """
-
-import time
 
 import pandas as pd
 from playwright.sync_api import sync_playwright
@@ -15,10 +22,7 @@ from playwright.sync_api import sync_playwright
 from review_scraper.config import (
     REVIEW_LINKS_FILE,
     ARTICLE_HTML_DIR,
-    ARTICLE_LIMIT,
     START_INDEX,
-    SCRAPE_ONE_ARTICLE_PER_RUN,
-    REQUEST_DELAY_SECONDS,
     PAGE_TIMEOUT_MS,
     PAGE_WAIT_MS,
     HEADLESS,
@@ -28,12 +32,12 @@ from review_scraper.config import (
 from review_scraper.utils import make_safe_filename
 
 
-INPUT_FILE = REVIEW_LINKS_FILE
-
-
 def is_cloudflare_block(html: str) -> bool:
     """
     Detect whether the downloaded HTML is a Cloudflare block page.
+
+    This prevents the scraper from saving a block page as if it were a
+    valid article.
     """
 
     block_indicators = [
@@ -45,28 +49,49 @@ def is_cloudflare_block(html: str) -> bool:
     return any(indicator in html for indicator in block_indicators)
 
 
+def get_next_unscraped_url(links_df: pd.DataFrame) -> str | None:
+    """
+    Return the first review URL that does not already have a saved HTML file.
+
+    START_INDEX can be used to resume checking from a later row in the link
+    file if needed.
+    """
+
+    for _, row in links_df.iloc[START_INDEX:].iterrows():
+        url = (
+            row["normalized_url"]
+            if "normalized_url" in row and pd.notna(row["normalized_url"])
+            else row["url"]
+        )
+
+        output_file = ARTICLE_HTML_DIR / make_safe_filename(url)
+
+        if not output_file.exists():
+            return url
+
+    return None
+
+
 def main() -> None:
     """
-    Visit review URLs and save raw HTML.
+    Scrape the next missing Pinkbike review article and save its raw HTML.
     """
 
     create_project_directories()
 
-    links_df = pd.read_csv(INPUT_FILE)
+    links_df = pd.read_csv(REVIEW_LINKS_FILE)
+    url = get_next_unscraped_url(links_df)
 
-    if ARTICLE_LIMIT is None:
-        sample_links = links_df.iloc[START_INDEX:]
-    else:
-        sample_links = links_df.iloc[START_INDEX:START_INDEX + ARTICLE_LIMIT]
+    if url is None:
+        print("No missing article HTML files found.")
+        return
 
-    processed_count = 0
-    downloaded_count = 0
-    skipped_count = 0
-    failed_count = 0
+    output_file = ARTICLE_HTML_DIR / make_safe_filename(url)
+
+    print(f"[SCRAPE] {url}")
 
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=HEADLESS)
-        context = None
 
         try:
             context = browser.new_context(
@@ -82,74 +107,41 @@ def main() -> None:
 
             page = context.new_page()
 
-            for index, row in sample_links.iterrows():
-                processed_count += 1
+            page.goto(
+                url,
+                wait_until="domcontentloaded",
+                timeout=PAGE_TIMEOUT_MS,
+            )
 
-                url = (
-                    row["normalized_url"]
-                    if "normalized_url" in row and pd.notna(row["normalized_url"])
-                    else row["url"]
-                )
+            page.wait_for_timeout(PAGE_WAIT_MS)
 
-                output_file = ARTICLE_HTML_DIR / make_safe_filename(url)
+            """
+            Simulate a small amount of user interaction so lazy-loaded
+            page content has a chance to appear before saving HTML.
+            """
+            page.mouse.move(400, 400)
+            page.mouse.wheel(0, 500)
+            page.wait_for_timeout(1500)
 
-                if output_file.exists():
-                    skipped_count += 1
-                    print(f"[SKIP] {output_file.name}")
-                    continue
+            html = page.content()
 
-                print(f"[SCRAPE] {index + 1}: {url}")
+            if is_cloudflare_block(html):
+                print(f"[BLOCKED] {url}")
+                print("Cloudflare block detected. Article was not saved.")
+                return
 
-                try:
-                    page.goto(
-                        url,
-                        wait_until="domcontentloaded",
-                        timeout=PAGE_TIMEOUT_MS,
-                    )
+            output_file.write_text(html, encoding="utf-8")
 
-                    page.wait_for_timeout(PAGE_WAIT_MS)
+            print(f"[SAVE] {output_file.name}")
+            print(f"HTML size: {len(html):,} characters")
 
-                    page.mouse.move(400, 400)
-                    page.mouse.wheel(0, 500)
-                    page.wait_for_timeout(1500)
-
-                    html = page.content()
-
-                    if is_cloudflare_block(html):
-                        failed_count += 1
-                        print(f"[BLOCKED] {url}")
-                        print("Cloudflare block detected. Ending scrape.")
-                        break
-
-                    output_file.write_text(html, encoding="utf-8")
-
-                    downloaded_count += 1
-                    print(f"[SAVE] {output_file.name}")
-                    print(f"HTML size: {len(html):,} characters")
-
-                    if SCRAPE_ONE_ARTICLE_PER_RUN:
-                        print("One-article-per-run mode enabled. Exiting.")
-                        break
-
-                except Exception as error:
-                    failed_count += 1
-                    print(f"[FAIL] {url}")
-                    print(f"Error: {error}")
-
-                time.sleep(REQUEST_DELAY_SECONDS)
+        except Exception as error:
+            print(f"[FAIL] {url}")
+            print(f"Error: {error}")
 
         finally:
-            if context is not None:
-                context.close()
-
+            context.close()
             browser.close()
-
-    print("\nScrape summary")
-    print("--------------")
-    print(f"Articles processed: {processed_count}")
-    print(f"Downloaded:         {downloaded_count}")
-    print(f"Skipped:            {skipped_count}")
-    print(f"Failed:             {failed_count}")
 
 
 if __name__ == "__main__":
