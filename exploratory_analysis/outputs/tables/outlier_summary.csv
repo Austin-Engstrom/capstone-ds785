@@ -1,0 +1,7 @@
+variable,outlier_count,outlier_pct
+retail_price,0,0.0
+article_text_length,1,0.34
+article_word_count,1,0.34
+title_length,2,0.68
+title_word_count,1,0.34
+avg_word_length,1,0.34

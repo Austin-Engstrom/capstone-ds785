@@ -1,0 +1,7 @@
+,mean,median,std_dev,skewness,kurtosis
+retail_price,3422.8,1250.0,3717.24,0.83,-0.57
+article_text_length,12804.71,11344.0,5869.89,0.48,-0.62
+article_word_count,2238.45,1967.0,1025.37,0.49,-0.6
+title_length,55.6,55.0,14.96,0.29,0.16
+title_word_count,9.37,9.0,2.66,0.27,-0.2
+avg_word_length,4.41,4.41,0.11,0.09,-0.08
