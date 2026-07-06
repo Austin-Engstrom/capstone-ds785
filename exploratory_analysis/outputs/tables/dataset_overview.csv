@@ -1,0 +1,13 @@
+metric,value
+rows,296
+columns,25
+unique_brands,127
+unique_categories,3
+unique_review_types,6
+date_min,2017-11-29 22:38:00+00:00
+date_max,2026-06-29 18:46:00+00:00
+avg_article_words,2238.45
+median_article_words,1967.0
+avg_word_length,4.41
+reviews_with_price,278
+reviews_with_product_name,36
