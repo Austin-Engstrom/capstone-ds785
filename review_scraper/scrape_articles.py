@@ -18,6 +18,7 @@ and annotation.
 
 import pandas as pd
 from playwright.sync_api import sync_playwright
+from typing import Optional
 
 from review_scraper.config import (
     REVIEW_LINKS_FILE,
@@ -49,7 +50,7 @@ def is_cloudflare_block(html: str) -> bool:
     return any(indicator in html for indicator in block_indicators)
 
 
-def get_next_unscraped_url(links_df: pd.DataFrame) -> str | None:
+def get_next_unscraped_url(links_df: pd.DataFrame) -> Optional[str]:
     """
     Return the first review URL that does not already have a saved HTML file.
 
