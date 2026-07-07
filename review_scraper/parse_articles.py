@@ -452,35 +452,85 @@ def extract_brand(title: Optional[str], article_text: str) -> Optional[str]:
 
     return None
 
-def extract_product_name(title: Optional[str], brand: Optional[str]) -> Optional[str]:
+def extract_product_from_tags(
+    brand: Optional[str],
+    tags: Optional[Union[list[str], str]]
+) -> Optional[str]:
     """
-    Extract product model name from article title.
+    Extract product model name from article tags.
     """
 
-    if not title:
+    if not brand or not tags:
         return None
 
-    cleaned = title.split(":")[0]
+    if isinstance(tags, str):
+        tags = [tag.strip() for tag in tags.split(",")]
 
-    cleaned = re.sub(
-        r"\b(review|long-term review|long term review|field test|first ride|tested)\b",
-        "",
-        cleaned,
-        flags=re.IGNORECASE,
-    )
+    brand_clean = brand.lower().strip()
 
-    if brand:
-        cleaned = re.sub(
-            rf"^{re.escape(brand)}\s+",
-            "",
-            cleaned,
-            flags=re.IGNORECASE,
-        )
+    brand_slugs = {
+        brand_clean.replace(" ", "-"),
+        brand_clean.replace(" bikes", "").replace(" ", "-"),
+        brand_clean.replace(" bike", "").replace(" ", "-"),
+        brand_clean.replace(" cycles", "").replace(" ", "-"),
+        brand_clean.replace(" cycle works", "").replace(" ", "-"),
+    }
 
-    cleaned = re.sub(r"[-–—]+", " ", cleaned)
-    cleaned = re.sub(r"\s+", " ", cleaned).strip()
+    ignore_tags = {
+        "reviews",
+        "reviews-and-tech",
+        "field-test",
+        "first-ride",
+        "big-brake-test",
+        "trail-bikes",
+        "enduro-bikes",
+        "dh-bikes",
+        "xc-bikes",
+        "brakes",
+        "videos",
+    }
 
-    return cleaned if cleaned else None
+    for tag in tags:
+        tag_clean = tag.lower().strip()
+
+        if tag_clean in ignore_tags:
+            continue
+
+        for brand_slug in brand_slugs:
+            if tag_clean == brand_slug:
+                continue
+
+            if tag_clean.startswith(f"{brand_slug}-"):
+                product_slug = tag_clean.replace(f"{brand_slug}-", "", 1)
+                return product_slug.replace("-", " ").title()
+
+    return None
+
+def extract_product_name(
+    title: Optional[str],
+    brand: Optional[str],
+    tags: Optional[list[str] | str] = None
+) -> Optional[str]:
+    """
+    Extract product model name from article tags.
+    Use title only to validate the tag-derived product.
+    """
+
+    tag_product = extract_product_from_tags(brand, tags)
+
+    if not tag_product:
+        return None
+
+    if not title:
+        return tag_product
+
+    title_clean = title.lower()
+    product_clean = tag_product.lower()
+
+    if product_clean in title_clean:
+        return tag_product
+
+    return None
 
 """
 Single-article parser
@@ -527,7 +577,7 @@ def parse_article(html_file: Path) -> dict:
     classification_text = f"{title} {tags} {article_text}"
 
     brand = extract_brand(title, article_text)
-    product_name = extract_product_name(title, brand)
+    product_name = extract_product_name(title, brand, tags)
 
     product_category = classify_product_category(classification_text)
     product_subcategory = classify_product_subcategory(classification_text)
