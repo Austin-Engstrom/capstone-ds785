@@ -1,30 +1,30 @@
 # Exploratory Data Analysis Summary
 
 ## Dataset Overview
-- Reviews: 296
+- Reviews: 297
 - Columns: 25
-- Unique Brands: 127
+- Unique Brands: 151
 - Product Categories: 3
 - Review Types: 6
-- Date Range: 2017-11-29 22:38:00+00:00 to 2026-06-29 18:46:00+00:00
+- Date Range: 2017-11-29 22:38:00+00:00 to 2026-07-06 15:01:00+00:00
 
 ## Article Length
-- Mean Word Count: 2238.4
-- Median Word Count: 1967.0
+- Mean Word Count: 2241.3
+- Median Word Count: 1972.0
 - Minimum Word Count: 200
 - Maximum Word Count: 5611
 - Mean Average Word Length: 4.41
 
 ## Retail Price
-- Reviews with Price: 278 of 296
+- Reviews with Price: 279 of 297
 - Missing Price Percentage: 6.1%
-- Mean Retail Price: $3,423
+- Mean Retail Price: $3,429
 - Median Retail Price: $1,250
 - Maximum Retail Price: $14,999
 - Retail Price Skewness: 0.83
 
 ## Missing Values
-- Product Name Missing Percentage: 87.8%
+- Product Name Missing Percentage: 13.1%
 - Retail Price Missing Percentage: 6.1%
 - Article Text Missing Percentage: 0.0%
 
