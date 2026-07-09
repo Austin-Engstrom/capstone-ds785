@@ -1,7 +1,8 @@
 metric,value
 rows,297
-columns,25
-unique_brands,151
+original_features,17
+eda_features_total,25
+unique_manufacturers,151
 unique_categories,3
 unique_review_types,6
 date_min,2017-11-29 22:38:00+00:00
@@ -11,3 +12,4 @@ median_article_words,1972.0
 avg_word_length,4.41
 reviews_with_price,279
 reviews_with_product_name,258
+product_name_missing_pct,13.13

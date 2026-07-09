@@ -7,9 +7,9 @@ Generates:
 - descriptive statistics
 - distribution statistics
 - outlier summary
-- category / review type / brand counts
+- category / review type / manufacturer counts
 - engineered text features
-- visualizations for presentation
+- presentation-ready visualizations
 - markdown EDA summary
 """
 
@@ -37,6 +37,8 @@ FIGURE_DIR.mkdir(parents=True, exist_ok=True)
 # Load data
 
 df = pd.read_csv(INPUT_FILE)
+original_feature_count = len(df.columns)
+
 
 df["publish_date"] = pd.to_datetime(df["publish_date"], errors="coerce", utc=True)
 df["modified_date"] = pd.to_datetime(df["modified_date"], errors="coerce", utc=True)
@@ -64,17 +66,23 @@ df["title_word_count"] = (
     .str.len()
 )
 
+def calculate_avg_word_length(text: str) -> float:
+    """
+    Calculate average word length for an article body.
+    """
+
+    words = re.findall(r"\w+", text)
+
+    if not words:
+        return 0
+
+    return sum(len(word) for word in words) / len(words)
+
+
 df["avg_word_length"] = (
     df["article_text"]
     .fillna("")
-    .apply(
-        lambda text: (
-            sum(len(word) for word in re.findall(r"\w+", text))
-            / len(re.findall(r"\w+", text))
-        )
-        if re.findall(r"\w+", text)
-        else 0
-    )
+    .apply(calculate_avg_word_length)
 )
 
 df["publish_year"] = df["publish_date"].dt.year
@@ -90,8 +98,9 @@ overview = pd.DataFrame(
     {
         "metric": [
             "rows",
-            "columns",
-            "unique_brands",
+            "original_features",
+            "eda_features_total",
+            "unique_manufacturers",
             "unique_categories",
             "unique_review_types",
             "date_min",
@@ -101,9 +110,11 @@ overview = pd.DataFrame(
             "avg_word_length",
             "reviews_with_price",
             "reviews_with_product_name",
+            "product_name_missing_pct",
         ],
         "value": [
             len(df),
+            original_feature_count,
             len(df.columns),
             df["brand"].nunique(),
             df["product_category"].nunique(),
@@ -115,6 +126,7 @@ overview = pd.DataFrame(
             round(df["avg_word_length"].mean(), 2),
             int(df["has_price"].sum()),
             int(df["has_product_name"].sum()),
+            round(df["product_name"].isna().mean() * 100, 2),
         ],
     }
 )
@@ -172,7 +184,11 @@ distribution_stats.to_csv(TABLE_DIR / "distribution_statistics.csv")
 
 # Outlier summary using IQR method
 
-def iqr_outlier_count(series):
+def iqr_outlier_count(series: pd.Series) -> int:
+    """
+    Count outliers using the standard 1.5 * IQR rule.
+    """
+
     series = series.dropna()
 
     q1 = series.quantile(0.25)
@@ -203,6 +219,7 @@ outlier_summary.to_csv(TABLE_DIR / "outlier_summary.csv", index=False)
 
 # Frequency tables
 
+df["brand"].value_counts().to_csv(TABLE_DIR / "manufacturer_counts.csv")
 df["brand"].value_counts().to_csv(TABLE_DIR / "brand_counts.csv")
 df["product_category"].value_counts().to_csv(TABLE_DIR / "category_counts.csv")
 df["product_subcategory"].value_counts().to_csv(TABLE_DIR / "subcategory_counts.csv")
@@ -211,44 +228,88 @@ df["publish_year"].value_counts().sort_index().to_csv(TABLE_DIR / "publish_year_
 df["publish_month"].value_counts().sort_index().to_csv(TABLE_DIR / "publish_month_counts.csv")
 
 
-# Visualizations
+# Visualization helpers
 
-def save_bar_chart(series, title, xlabel, ylabel, filename, top_n=None):
+def apply_chart_formatting() -> None:
+    """
+    Apply consistent chart formatting for presentation-ready figures.
+    """
+
+    plt.grid(axis="y", alpha=0.3)
+    plt.tight_layout()
+
+
+def save_bar_chart(
+    series: pd.Series,
+    title: str,
+    xlabel: str,
+    ylabel: str,
+    filename: str,
+    top_n: int | None = None,
+) -> None:
+    """
+    Save a horizontal bar chart from a frequency series.
+    """
+
     if top_n:
         series = series.head(top_n)
 
     plt.figure(figsize=(10, 6))
     series.sort_values().plot(kind="barh")
-    plt.title(title)
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
-    plt.tight_layout()
-    plt.savefig(FIGURE_DIR / filename, dpi=300)
+    plt.title(title, fontsize=14)
+    plt.xlabel(xlabel, fontsize=11)
+    plt.ylabel(ylabel, fontsize=11)
+    plt.xticks(fontsize=9)
+    plt.yticks(fontsize=9)
+    apply_chart_formatting()
+    plt.savefig(FIGURE_DIR / filename, dpi=300, bbox_inches="tight")
+    plt.close()
+
+
+def save_histogram(
+    series: pd.Series,
+    title: str,
+    xlabel: str,
+    ylabel: str,
+    filename: str,
+    bins: int = 30,
+) -> None:
+    """
+    Save a histogram from a numeric series.
+    """
+
+    plt.figure(figsize=(10, 6))
+    series.dropna().plot(kind="hist", bins=bins)
+    plt.title(title, fontsize=14)
+    plt.xlabel(xlabel, fontsize=11)
+    plt.ylabel(ylabel, fontsize=11)
+    plt.xticks(fontsize=9)
+    plt.yticks(fontsize=9)
+    apply_chart_formatting()
+    plt.savefig(FIGURE_DIR / filename, dpi=300, bbox_inches="tight")
     plt.close()
 
 
 # Article length histogram
 
-plt.figure(figsize=(10, 6))
-df["article_word_count"].plot(kind="hist", bins=30)
-plt.title("Distribution of Article Word Counts")
-plt.xlabel("Word Count")
-plt.ylabel("Number of Reviews")
-plt.tight_layout()
-plt.savefig(FIGURE_DIR / "article_word_count_histogram.png", dpi=300)
-plt.close()
+save_histogram(
+    df["article_word_count"],
+    title="Distribution of Review Word Counts",
+    xlabel="Review Word Count",
+    ylabel="Number of Reviews",
+    filename="article_word_count_histogram.png",
+)
 
 
 # Retail price histogram
 
-plt.figure(figsize=(10, 6))
-df["retail_price"].dropna().plot(kind="hist", bins=30)
-plt.title("Distribution of Retail Prices")
-plt.xlabel("Retail Price")
-plt.ylabel("Number of Reviews")
-plt.tight_layout()
-plt.savefig(FIGURE_DIR / "retail_price_histogram.png", dpi=300)
-plt.close()
+save_histogram(
+    df["retail_price"],
+    title="Distribution of Retail Prices",
+    xlabel="Retail Price (USD)",
+    ylabel="Number of Reviews",
+    filename="retail_price_histogram.png",
+)
 
 
 # Missing values chart
@@ -260,21 +321,23 @@ missing_plot = missing_values[missing_values["missing_count"] > 0].sort_values(
 
 plt.figure(figsize=(8, 6))
 plt.barh(missing_plot["column"], missing_plot["missing_count"])
-plt.title("Missing Values by Variable")
-plt.xlabel("Missing Records")
-plt.ylabel("Column")
-plt.tight_layout()
-plt.savefig(FIGURE_DIR / "missing_values.png", dpi=300)
+plt.title("Missing Values by Feature", fontsize=14)
+plt.xlabel("Missing Records", fontsize=11)
+plt.ylabel("Feature", fontsize=11)
+plt.xticks(fontsize=9)
+plt.yticks(fontsize=9)
+apply_chart_formatting()
+plt.savefig(FIGURE_DIR / "missing_values.png", dpi=300, bbox_inches="tight")
 plt.close()
 
 
-# Top brands
+# Top manufacturers
 
 save_bar_chart(
     df["brand"].value_counts(),
-    title="Top 20 Brands by Review Count",
+    title="Top Manufacturers by Review Count",
     xlabel="Number of Reviews",
-    ylabel="Brand",
+    ylabel="Manufacturer",
     filename="top_20_brands.png",
     top_n=20,
 )
@@ -306,11 +369,13 @@ save_bar_chart(
 
 plt.figure(figsize=(10, 6))
 df["publish_year"].value_counts().sort_index().plot(kind="bar")
-plt.title("Reviews by Publication Year")
-plt.xlabel("Publication Year")
-plt.ylabel("Number of Reviews")
-plt.tight_layout()
-plt.savefig(FIGURE_DIR / "reviews_by_year.png", dpi=300)
+plt.title("Reviews by Publication Year", fontsize=14)
+plt.xlabel("Publication Year", fontsize=11)
+plt.ylabel("Number of Reviews", fontsize=11)
+plt.xticks(rotation=0, fontsize=9)
+plt.yticks(fontsize=9)
+apply_chart_formatting()
+plt.savefig(FIGURE_DIR / "reviews_by_year.png", dpi=300, bbox_inches="tight")
 plt.close()
 
 
@@ -320,12 +385,13 @@ timeline = df["publish_month"].value_counts().sort_index()
 
 plt.figure(figsize=(12, 5))
 timeline.plot(kind="line")
-plt.title("Reviews Published Over Time")
-plt.xlabel("Publication Month")
-plt.ylabel("Number of Reviews")
-plt.xticks(rotation=45, ha="right")
-plt.tight_layout()
-plt.savefig(FIGURE_DIR / "publication_timeline.png", dpi=300)
+plt.title("Reviews Published Over Time", fontsize=14)
+plt.xlabel("Publication Month", fontsize=11)
+plt.ylabel("Number of Reviews", fontsize=11)
+plt.xticks(rotation=45, ha="right", fontsize=8)
+plt.yticks(fontsize=9)
+apply_chart_formatting()
+plt.savefig(FIGURE_DIR / "publication_timeline.png", dpi=300, bbox_inches="tight")
 plt.close()
 
 
@@ -335,12 +401,12 @@ corr = df[numeric_cols].corr(numeric_only=True)
 
 plt.figure(figsize=(8, 6))
 plt.imshow(corr)
-plt.xticks(range(len(corr.columns)), corr.columns, rotation=45, ha="right")
-plt.yticks(range(len(corr.columns)), corr.columns)
+plt.xticks(range(len(corr.columns)), corr.columns, rotation=45, ha="right", fontsize=9)
+plt.yticks(range(len(corr.columns)), corr.columns, fontsize=9)
 plt.colorbar(label="Correlation")
-plt.title("Correlation Matrix of Numeric Features")
+plt.title("Correlation Matrix of Numeric Features", fontsize=14)
 plt.tight_layout()
-plt.savefig(FIGURE_DIR / "numeric_correlation_matrix.png", dpi=300)
+plt.savefig(FIGURE_DIR / "numeric_correlation_matrix.png", dpi=300, bbox_inches="tight")
 plt.close()
 
 
@@ -351,8 +417,9 @@ summary = f"""
 
 ## Dataset Overview
 - Reviews: {len(df)}
-- Columns: {len(df.columns)}
-- Unique Brands: {df["brand"].nunique()}
+- Original Features: {original_feature_count}
+- EDA Features After Engineering: {len(df.columns)}
+- Unique Manufacturers: {df["brand"].nunique()}
 - Product Categories: {df["product_category"].nunique()}
 - Review Types: {df["review_type"].nunique()}
 - Date Range: {df["publish_date"].min()} to {df["publish_date"].max()}
@@ -380,10 +447,10 @@ summary = f"""
 ## Key Findings
 - The dataset contains long-form professional mountain bike product reviews rather than short customer reviews.
 - Retail price is right-skewed, which is expected because premium bicycles and components can have very high MSRPs.
-- Brand representation is spread across many manufacturers, reducing the risk that the model only learns patterns from one dominant brand.
+- Manufacturer representation is spread across many companies, reducing the risk that the model only learns patterns from one dominant manufacturer.
 - Product categories are somewhat imbalanced, with fewer clothing reviews than component and protective gear reviews.
-- Product name extraction remains a future ETL improvement because many professional review articles do not expose a single clean product name field.
-- Engineered text features such as word count, title length, publication year, and price availability provide useful context for downstream sentiment modeling.
+- Missing product names are primarily associated with multi-product, roundup, and editorial articles rather than missing review text.
+- Engineered text features such as review word count, title length, publication year, and price availability provide useful context for downstream sentiment modeling.
 """
 
 with open(TABLE_DIR / "eda_summary.md", "w") as f:

@@ -2,8 +2,9 @@
 
 ## Dataset Overview
 - Reviews: 297
-- Columns: 25
-- Unique Brands: 151
+- Original Features: 17
+- EDA Features After Engineering: 25
+- Unique Manufacturers: 151
 - Product Categories: 3
 - Review Types: 6
 - Date Range: 2017-11-29 22:38:00+00:00 to 2026-07-06 15:01:00+00:00
@@ -31,7 +32,7 @@
 ## Key Findings
 - The dataset contains long-form professional mountain bike product reviews rather than short customer reviews.
 - Retail price is right-skewed, which is expected because premium bicycles and components can have very high MSRPs.
-- Brand representation is spread across many manufacturers, reducing the risk that the model only learns patterns from one dominant brand.
+- Manufacturer representation is spread across many companies, reducing the risk that the model only learns patterns from one dominant manufacturer.
 - Product categories are somewhat imbalanced, with fewer clothing reviews than component and protective gear reviews.
-- Product name extraction remains a future ETL improvement because many professional review articles do not expose a single clean product name field.
-- Engineered text features such as word count, title length, publication year, and price availability provide useful context for downstream sentiment modeling.
+- Missing product names are primarily associated with multi-product, roundup, and editorial articles rather than missing review text.
+- Engineered text features such as review word count, title length, publication year, and price availability provide useful context for downstream sentiment modeling.
