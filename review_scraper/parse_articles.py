@@ -452,6 +452,65 @@ def extract_brand(title: Optional[str], article_text: str) -> Optional[str]:
 
     return None
 
+def build_brand_slugs(brand: str) -> set[str]:
+    """
+    Build possible Pinkbike tag prefixes for a brand.
+    """
+
+    brand_slug = normalize_brand_slug(brand)
+    brand_slugs = {brand_slug}
+
+    suffixes = [
+        "-bikes",
+        "-bike",
+        "-cycles",
+        "-cycle-works",
+        "-works",
+        "-components",
+        "-suspension",
+        "-racing",
+        "-clothing",
+    ]
+
+    for suffix in suffixes:
+        if brand_slug.endswith(suffix):
+            brand_slugs.add(brand_slug[:-len(suffix)])
+
+    # Also keep the first word of longer manufacturer names.
+    # Example: allied-cycle-works -> allied
+    parts = brand_slug.split("-")
+    if len(parts) > 1:
+        brand_slugs.add(parts[0])
+
+    return brand_slugs
+
+def normalize_brand_slug(brand: str) -> str:
+    """
+    Normalize a brand name into the slug format commonly used by Pinkbike tags.
+
+    Examples:
+        Forge+Bond -> forge-and-bond
+        Chris King -> chris-king
+        Cane Creek -> cane-creek
+        Santa Cruz -> santa-cruz
+        YT -> yt
+    """
+
+    slug = brand.lower().strip()
+
+    # Replace common symbols
+    slug = slug.replace("&", "and")
+    slug = slug.replace("+", "-and-")
+    slug = slug.replace("'", "")
+
+    # Replace any remaining non-alphanumeric characters with hyphens
+    slug = re.sub(r"[^a-z0-9]+", "-", slug)
+
+    # Collapse duplicate hyphens
+    slug = re.sub(r"-+", "-", slug).strip("-")
+
+    return slug
+
 def extract_product_from_tags(
     brand: Optional[str],
     tags: Optional[Union[list[str], str]]
@@ -466,15 +525,7 @@ def extract_product_from_tags(
     if isinstance(tags, str):
         tags = [tag.strip() for tag in tags.split(",")]
 
-    brand_clean = brand.lower().strip()
-
-    brand_slugs = {
-        brand_clean.replace(" ", "-"),
-        brand_clean.replace(" bikes", "").replace(" ", "-"),
-        brand_clean.replace(" bike", "").replace(" ", "-"),
-        brand_clean.replace(" cycles", "").replace(" ", "-"),
-        brand_clean.replace(" cycle works", "").replace(" ", "-"),
-    }
+    brand_slugs = build_brand_slugs(brand)
 
     ignore_tags = {
         "reviews",
@@ -486,7 +537,15 @@ def extract_product_from_tags(
         "enduro-bikes",
         "dh-bikes",
         "xc-bikes",
+        "gravel-bikes",
+        "emtb",
+        "e-bikes",
+        "helmets",
+        "shoes",
+        "tires",
+        "wheels",
         "brakes",
+        "suspension",
         "videos",
     }
 
@@ -496,12 +555,16 @@ def extract_product_from_tags(
         if tag_clean in ignore_tags:
             continue
 
-        for brand_slug in brand_slugs:
-            if tag_clean == brand_slug:
+        for slug in brand_slugs:
+            if tag_clean == slug:
                 continue
 
-            if tag_clean.startswith(f"{brand_slug}-"):
-                product_slug = tag_clean.replace(f"{brand_slug}-", "", 1)
+            if tag_clean.startswith(f"{slug}-"):
+                product_slug = tag_clean[len(slug) + 1:]
+
+                if not product_slug:
+                    continue
+
                 return product_slug.replace("-", " ").title()
 
     return None
