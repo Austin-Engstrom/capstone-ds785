@@ -432,12 +432,27 @@ matching uses the active brand reference table, while product name
 extraction cleans the article title after removing review-related wording.
 """
 
-def extract_brand(title: Optional[str], article_text: str) -> Optional[str]:
+def extract_brand(
+    title: Optional[str],
+    tags: Optional[list[str] | str] = None
+) -> Optional[str]:
     """
-    Extract the product brand using the brand reference table.
+    Extract the product brand using title and article tags.
     """
 
-    for source_text in [title, article_text]:
+    tag_text = ""
+
+    if isinstance(tags, list):
+        tag_text = " ".join(tags)
+    elif isinstance(tags, str):
+        tag_text = tags
+
+    source_texts = [
+        title,
+        tag_text,
+    ]
+
+    for source_text in source_texts:
         if not source_text:
             continue
 
@@ -451,6 +466,33 @@ def extract_brand(title: Optional[str], article_text: str) -> Optional[str]:
                 return brand_name
 
     return None
+
+def normalize_brand_slug(brand: str) -> str:
+    """
+    Normalize a brand name into the slug format commonly used by Pinkbike tags.
+
+    Examples:
+        Forge+Bond -> forge-and-bond
+        Chris King -> chris-king
+        Cane Creek -> cane-creek
+        Santa Cruz -> santa-cruz
+        YT -> yt
+    """
+
+    slug = brand.lower().strip()
+
+    # Replace common symbols
+    slug = slug.replace("&", "and")
+    slug = slug.replace("+", "-and-")
+    slug = slug.replace("'", "")
+
+    # Replace any remaining non-alphanumeric characters with hyphens
+    slug = re.sub(r"[^a-z0-9]+", "-", slug)
+
+    # Collapse duplicate hyphens
+    slug = re.sub(r"-+", "-", slug).strip("-")
+
+    return slug
 
 def extract_product_from_tags(
     brand: Optional[str],
@@ -466,15 +508,30 @@ def extract_product_from_tags(
     if isinstance(tags, str):
         tags = [tag.strip() for tag in tags.split(",")]
 
-    brand_clean = brand.lower().strip()
+    brand_slug = normalize_brand_slug(brand)
 
-    brand_slugs = {
-        brand_clean.replace(" ", "-"),
-        brand_clean.replace(" bikes", "").replace(" ", "-"),
-        brand_clean.replace(" bike", "").replace(" ", "-"),
-        brand_clean.replace(" cycles", "").replace(" ", "-"),
-        brand_clean.replace(" cycle works", "").replace(" ", "-"),
-    }
+    brand_slugs = {brand_slug}
+
+    suffixes = [
+        "-bikes",
+        "-bike",
+        "-bicycles",
+        "-bicycle",
+        "-cycles",
+        "-cycle-works",
+        "-works",
+        "-components",
+        "-suspension",
+        "-racing",
+        "-clothing",
+        "-industries",
+    ]
+
+    for suffix in suffixes:
+        if brand_slug.endswith(suffix):
+            brand_slugs.add(brand_slug[:-len(suffix)])
+
+    brand_slugs = sorted(brand_slugs, key=len, reverse=True)
 
     ignore_tags = {
         "reviews",
@@ -482,12 +539,40 @@ def extract_product_from_tags(
         "field-test",
         "first-ride",
         "big-brake-test",
+        "ridden-and-rated",
+        "check-out",
         "trail-bikes",
         "enduro-bikes",
         "dh-bikes",
         "xc-bikes",
+        "gravel-bikes",
+        "emtb",
+        "e-bikes",
+        "helmets",
+        "shoes",
+        "tires",
+        "wheels",
         "brakes",
+        "suspension",
+        "apparel",
         "videos",
+    }
+
+    company_product_slugs = {
+        "bike",
+        "bikes",
+        "bicycle",
+        "bicycles",
+        "cycles",
+        "cycle-works",
+        "works",
+        "components",
+        "suspension",
+        "racing",
+        "clothing",
+        "industries",
+        "mountain",
+        "cycling",
     }
 
     for tag in tags:
@@ -496,15 +581,149 @@ def extract_product_from_tags(
         if tag_clean in ignore_tags:
             continue
 
-        for brand_slug in brand_slugs:
-            if tag_clean == brand_slug:
+        for slug in brand_slugs:
+            if tag_clean == slug:
                 continue
 
-            if tag_clean.startswith(f"{brand_slug}-"):
-                product_slug = tag_clean.replace(f"{brand_slug}-", "", 1)
+            if tag_clean.startswith(f"{slug}-"):
+                product_slug = tag_clean[len(slug) + 1:]
+
+                if not product_slug:
+                    continue
+
+                if product_slug in company_product_slugs:
+                    continue
+
                 return product_slug.replace("-", " ").title()
 
     return None
+
+def should_skip_product_name(title: Optional[str]) -> bool:
+    """
+    Identify articles where a single product name should not be extracted.
+    """
+
+    if not title:
+        return True
+
+    title_clean = title.lower().strip()
+
+    skip_patterns = [
+        r"^video:",
+        r"^podcast:",
+        r"^pinkbike content submission guide",
+        r"^the good, the bad",
+        r"^can mtb brakes",
+        r"\bbest\b",
+        r"\beditors'? choice\b",
+        r"\bvalue product of the year\b",
+        r"\broundup\b",
+        r"\bround-up\b",
+        r"\bridden\s*&\s*rated\b",
+        r"\bcomparison\b",
+        r"\bvs\.?\b",
+        r"\bversus\b",
+        r"\b\d+\s+(?:bikes|shoes|helmets|motors|tires|tyres|tools|devices|products|brakes|jackets|vests|pads|wheels|pedals)\b",        
+        r"\bfive\b",
+        r"\bsix\b",
+        r"\bseven\b",
+        r"^field test bonus:",
+        r"^video\s*[-:]",
+        r"\bvs\b",
+        r"\bcompared\b",
+        r"\bawards winners\b",
+        r"\b\d+\s+of the latest\b",
+        r"\b\d+\s+months on\b",
+        r"\bevery pair\b",
+    ]
+
+    return any(
+        re.search(pattern, title_clean, flags=re.IGNORECASE)
+        for pattern in skip_patterns
+    )
+
+def extract_product_from_title(
+    title: Optional[str],
+    brand: Optional[str],
+) -> Optional[str]:
+    """
+    Extract product model name from the article title when tags do not provide one.
+    """
+
+    if not title or not brand:
+        return None
+
+    title_clean = title.strip()
+
+    # Remove common review/article prefixes
+    title_clean = re.sub(
+        r"^(review|first ride|field test|long-term review|long term review|bike check|check out)\s*:\s*",
+        "",
+        title_clean,
+        flags=re.IGNORECASE,
+    )
+
+    # Remove possessive brand wording: Fox's, Cane Creek's, 7mesh's, etc.
+    title_clean = re.sub(
+        rf"\b{re.escape(brand)}['’]s\b",
+        "",
+        title_clean,
+        flags=re.IGNORECASE,
+    )
+
+    # Remove normal brand wording
+    title_clean = re.sub(
+        rf"\b{re.escape(brand)}\b",
+        "",
+        title_clean,
+        flags=re.IGNORECASE,
+    )
+
+    title_clean = re.sub(
+        r"^(the|new|revised)\s+",
+        "",
+        title_clean,
+        flags=re.IGNORECASE,
+    )
+
+    title_clean = re.split(
+        r"\s+(?:is|are|with|can|attempt|attempts)\s+",
+        title_clean,
+        maxsplit=1,
+        flags=re.IGNORECASE,
+    )[0]
+
+    # Remove leading model years
+    title_clean = re.sub(r"^\s*20\d{2}\s+", "", title_clean)
+
+    # Keep the main product phrase before subtitle/descriptive text
+    title_clean = re.split(r"\s+[-–—:]\s+", title_clean, maxsplit=1)[0]
+
+    # Remove common trailing product category words
+    title_clean = re.sub(
+        r"\b(?:bike|bikes|frame|frameset|brake|brakes|helmet|helmets|shoe|shoes|wheel|wheels|tire|tires|tyre|tyres|fork|shock|stem|handlebar|handlebars|pants|shorts|jacket|gloves?|pads?|pedals?)\b$",
+        "",
+        title_clean,
+        flags=re.IGNORECASE,
+    )
+    title_clean = re.sub(r"\s+", " ", title_clean).strip(" -–—:|")
+
+    if not title_clean:
+        return None
+
+    # Avoid returning generic leftovers
+    generic_values = {
+        "new",
+        "prototype",
+        "review",
+        "first ride",
+        "field test",
+    }
+
+    if title_clean.lower() in generic_values:
+        return None
+
+    return title_clean
 
 def extract_product_name(
     title: Optional[str],
@@ -512,23 +731,21 @@ def extract_product_name(
     tags: Optional[list[str] | str] = None
 ) -> Optional[str]:
     """
-    Extract product model name from article tags.
-    Use title only to validate the tag-derived product.
+    Extract product model name from tags first, then fall back to the title.
     """
+
+    if should_skip_product_name(title):
+        return None
 
     tag_product = extract_product_from_tags(brand, tags)
 
-    if not tag_product:
-        return None
-
-    if not title:
+    if tag_product:
         return tag_product
 
-    title_clean = title.lower()
-    product_clean = tag_product.lower()
+    title_product = extract_product_from_title(title, brand)
 
-    if product_clean in title_clean:
-        return tag_product
+    if title_product:
+        return title_product
 
     return None
 
@@ -576,7 +793,7 @@ def parse_article(html_file: Path) -> dict:
 
     classification_text = f"{title} {tags} {article_text}"
 
-    brand = extract_brand(title, article_text)
+    brand = extract_brand(title, tags)
     product_name = extract_product_name(title, brand, tags)
 
     product_category = classify_product_category(classification_text)
