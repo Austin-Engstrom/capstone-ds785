@@ -1,0 +1,2 @@
+model,evaluation_type,accuracy,balanced_accuracy,macro_precision,macro_recall,macro_f1,weighted_precision,weighted_recall,weighted_f1,cohen_kappa,roc_auc,test_article_count,best_cv_macro_f1,train_article_count
+Supervised Logistic Regression with TF-IDF,Binary Test Set,0.6557377049180327,0.596938775510204,0.5678571428571428,0.596938775510204,0.5638406537282942,0.7389929742388759,0.6557377049180327,0.6852760428004487,0.15109343936381725,0.6649659863945578,61,0.5427525612053997,240
