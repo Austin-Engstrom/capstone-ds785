@@ -1,0 +1,302 @@
+﻿article_id,title,manual_sentiment,chunk_count,total_chunk_words,minimum_chunk_words,average_chunk_words,maximum_chunk_words
+PB0001,Pinkbike Content Submission Guide,Positive,15,2763,56,184.2,222
+PB0002,Review: Rad Racks Rad4 Double-Folding Bike Rack,Positive,8,1397,84,174.62,205
+PB0003,Review: Giant Roost and Rail Helmets,Positive,7,1210,127,172.86,201
+PB0004,Review: Devinci Chainsaw - Primed for the Bike Park,Positive,18,3476,173,193.11,243
+PB0005,Review: Cannondale Habit Carbon LT1,Mixed,18,3591,181,199.5,226
+PB0006,Review: 2023 Propain Tyee CF,Positive,13,2408,32,185.23,222
+PB0007,Review: Cane Creek Coil IL Shock,Positive,7,1242,32,177.43,233
+PB0008,Review: Formula Cura 4 Brakes,Positive,10,1850,131,185.0,237
+PB0009,Review: Reserve 30|HD AL vs Race Face Turbine Wheels,Positive,9,1821,180,202.33,213
+PB0010,Review: Hope HB.916 - Better Late Than Never,Mixed,19,3698,93,194.63,230
+PB0011,Review: Vittoria Mazza Enduro Race Tires - A Compound Too Far?,Mixed,11,2064,125,187.64,217
+PB0012,Review: RockShox Vivid - Shock Week 2023,Positive,5,889,120,177.8,200
+PB0013,Review: DVO Topaz X - Shock Week 2023,Positive,6,1040,52,173.33,217
+PB0014,Review: Marzocchi Bomber Air - Shock Week 2023,Positive,4,754,184,188.5,195
+PB0015,WTB Develops New 750d Wheel Size,Mixed,2,307,117,153.5,190
+PB0016,Review: Chromag Darco - A Very Big Little Bike,Positive,16,3075,160,192.19,219
+PB0017,Review: 2023 Orbea Oiz M-Pro - Don't Call it Downcountry,Positive,14,2560,32,182.86,212
+PB0018,Review: Scor 2030 - The Trail Bike You Didn't Know You Wanted,Positive,14,2609,32,186.36,225
+PB0019,Review: Racer Gloves &amp; Joint Protection,Positive,10,1815,158,181.5,199
+PB0020,Review: Prime Rocket - Another Carbon Downhill Spaceship from Eastern Europe,Positive,15,2913,157,194.2,209
+PB0021,Review: Specialized Dissident 2 Helmet - Downhill Safety at an Enduro Weight,Positive,6,1013,52,168.83,224
+PB0022,Review: Factor Lando XC,Positive,20,3841,102,192.05,235
+PB0023,Review: Goodyear Newton MTR &amp; MTF Tires,Positive,10,1855,122,185.5,222
+PB0024,"Review: How Canyon's KIS Could Change Mountain Biking, and Why It Probably Won't",Negative,16,3056,108,191.0,214
+PB0025,Review: TranzX EDP01 Wireless Electronic Dropper Post,Mixed,6,1061,83,176.83,206
+PB0026,Review: Five Lightweight Full Face Helmets,Mixed,15,2782,102,185.47,215
+PB0027,Review: Reeb Steezl - US Made &amp; Super Capable,Positive,19,3613,73,190.16,244
+PB0028,Review: Some Pleasant Apparel Surprises From YT &amp; Enve,Positive,6,1053,117,175.5,191
+PB0029,Review: Kuat Huk Tailgate Pad,Mixed,6,1066,117,177.67,200
+PB0030,Field Test Review: 2024 Commencal Meta 5 SX - Supercross for a Reason,Positive,9,1786,180,198.44,240
+PB0031,Field Test Review: 2023 Unno Burn - You Know You're Curious,Positive,8,1463,84,182.88,218
+PB0032,Review: Cane Creek Tigon - The Air Charged Coil Shock,Positive,10,1915,151,191.5,215
+PB0033,Review: Spank 359 Downhill Wheels - Alloy Wheels Turned up to 11,Positive,9,1732,181,192.44,203
+PB0034,Review: Rocky Mountain Slayer C50,Positive,13,2359,86,181.46,211
+PB0035,Review: DT Swiss FR 1500 Wheelset,Positive,8,1536,139,192.0,236
+PB0036,Review: We Are One Arrival 170 - An Enduro Race Bike That Can Climb,Positive,18,3400,140,188.89,213
+PB0037,"Review: Trickstuff Piccola C22 Brakes - Light, Powerful, &amp; Pricey",Mixed,10,1952,167,195.2,220
+PB0038,Review: 2024 Fox Float Factory Shock,Positive,7,1251,84,178.71,205
+PB0039,Review: Five Ten Trailcross XT Shoes,Positive,6,1092,124,182.0,205
+PB0040,Review: LoamLab Counterpunch Hand Protecting Grips,Positive,8,1381,86,172.62,197
+PB0041,Review: EXT ERA V2.1 Fork,Positive,13,2402,47,184.77,219
+PB0042,Review: Funn Python Flat Pedals - Thin &amp; Grippy,Positive,7,1329,131,189.86,226
+PB0043,Review: Berd’s Hawk 30 Wheels Use String Spokes for Impressive Compliance,Positive,10,1842,120,184.2,202
+PB0044,Review: Shimano GF800 GTX Flat Pedal Shoes - Grippy &amp; Ready for the Rain,Positive,7,1366,180,195.14,230
+PB0045,Review: 2023 Transition Smuggler - The Little Ripper,Positive,20,3727,73,186.35,236
+PB0046,Review: Atherton 130.X - The Lugged Carbon Cruiser,Positive,13,2586,181,198.92,225
+PB0047,Review: Shimano XT Linkglide - Here For a Good Time AND a Long Time,Positive,12,2194,88,182.83,207
+PB0048,Review: Cane Creek Electric Wings Titanium Cranks,Positive,6,1123,137,187.17,208
+PB0049,Review: The Pivot Mach SL 4 Blends XC Speed &amp; Comfort,Positive,12,2336,180,194.67,237
+PB0050,Review: BMB Reverse Raise Stem - The Stem That Wants to Change Mountain Biking,Mixed,10,1921,142,192.1,242
+PB0051,Review: Devinci E-Troy Bosch GX LTD - An Aggro All-Mountain eMTB,Positive,19,3654,85,192.32,227
+PB0052,Review: Vee Tire Co's Gravity Lineup,Mixed,10,1916,177,191.6,233
+PB0053,Review: BYB Tech Telemetry 2.0 - Using Data Acquisition to Improve Suspension Set Up,Mixed,18,3261,44,181.17,206
+PB0054,Review: 2024 YT Jeffsy Core 4 - A Good Friend,Positive,16,3211,172,200.69,247
+PB0055,Reviewed: 6 of the Best Lightweight Elbow Pads for 2024,Positive,11,2154,177,195.82,210
+PB0056,Review: KS Lev Circuit Wireless Dropper Post,Mixed,8,1624,183,203.0,228
+PB0057,Review: Velocio's Trail Access Hardshell Jacket is Breathable &amp; Understated,Mixed,8,1466,107,183.25,204
+PB0058,Review: Squidworx Modular Flat Pedals,Mixed,8,1457,107,182.12,210
+PB0059,Review: Leatt's 3-in-1 MTB Enduro 3.0 Helmet,Mixed,7,1264,32,180.57,233
+PB0060,First Ride: Auckland Cycle Works Marra Prototype with KOLARP Suspension,Positive,19,3651,125,192.16,245
+PB0061,Review: Norco Fluid FS Carbon - A Comfortable Companion,Positive,15,2851,129,190.07,234
+PB0062,Review: The New 2024 Scott Ransom 900 RC Has All The Integration,Positive,24,4686,161,195.25,250
+PB0063,Review: 7mesh's Cache Anorak &amp; Grit Pants,Positive,9,1728,163,192.0,213
+PB0064,Review: 6 Months Aboard the Specialized Levo SL eMTB,Positive,20,3795,163,189.75,209
+PB0065,Review: Giro's New Coalition Lightweight Full Face Helmet,Positive,5,975,146,195.0,228
+PB0066,Review: Endura MT500 Burner Flat Pedal Shoes,Mixed,7,1316,130,188.0,249
+PB0067,Review: Renthal's New Revo-F Flat Pedals,Mixed,10,1752,40,175.2,201
+PB0068,Review: SRAM's New Maven Brakes - The Big Brake,Positive,10,1999,184,199.9,243
+PB0069,Review: Lewis LHT Ultimate Brakes - Clones or Contenders?,Mixed,13,2378,52,182.92,220
+PB0070,"Review: 2024 Norco Optic - High Pivot, Short Travel",Positive,19,3743,138,197.0,239
+PB0071,Review: 2024 Norco Sight - For All the Mountains,Positive,17,3301,86,194.18,232
+PB0072,First Ride: Revel Rascal V2,Positive,7,1385,191,197.86,203
+PB0073,"The Good, The Bad, and The Ugly: What Fenders Pinkbike's Editors Actually Use",Mixed,12,2252,119,187.67,216
+PB0074,Review: The Pivot Shadowcat is Niche &amp; Nimble,Positive,20,3811,107,190.55,244
+PB0075,Review: Fizik Nanuq GTX Clipless and Flat Shoes,Positive,8,1423,52,177.88,209
+PB0076,Review: Whyte Elyte 150 Works - 'One of the Best Handling E-Bikes',Positive,16,3094,142,193.38,240
+PB0077,Review: Specialized’s New Epic 8 - All the Speed You Need,Positive,18,3554,180,197.44,233
+PB0078,"Review: Manitou Mattoc Pro Fork - Reversed Arched, Foward Thinking",Positive,15,2784,85,185.6,209
+PB0079,Review: Yeti's Back in the XC Game With the 2024 ASR,Positive,18,3415,140,189.72,238
+PB0080,Review: Raaw Madonna V3,Positive,16,2949,32,184.31,227
+PB0081,Review: Formula Belva Dual-Crown Enduro Fork,Positive,9,1846,186,205.11,238
+PB0082,Review: 6 Months on the New Race Face Era Carbon Wheels,Positive,8,1563,182,195.38,220
+PB0083,Review: Yoshimura's New Chilao SS Flat Pedals,Positive,7,1303,129,186.14,221
+PB0084,Review: Knolly Chilcotin 170 - They Haven't Just Straightened the Top Tube,Positive,20,3866,139,193.3,226
+PB0085,Review: Logos Eudae 29 HD Carbon Wheels,Positive,6,1074,113,179.0,199
+PB0086,Review: 2024 Orbea Occam LT - Modernly Convenient,Positive,20,3910,180,195.5,231
+PB0087,"Review: SDG Tellis V2 Dropper Post - No Slop, More Drop",Positive,9,1592,52,176.89,204
+PB0088,Review: 6 Months with the New DT Swiss 240 DEG Hubs,Positive,6,1086,141,181.0,198
+PB0089,"Review: Zerode G3 - A Belt Driven, Gearbox Equipped DH Bike",Positive,19,3769,182,198.37,250
+PB0090,"Review: 3 of the Latest Burly Tailgate Pads from Dakine, Fox, &amp; Send It",Positive,14,2720,173,194.29,206
+PB0091,Review: Starling MegaMurmur - The Big Bird,Positive,14,2663,142,190.21,214
+PB0092,Review: EXT Aria Air Shock,Positive,13,2489,87,191.46,243
+PB0093,Review: SeaSucker Talon Bike Rack - Does It Suck?,Mixed,11,2171,172,197.36,229
+PB0094,Review: iXS Trigger X 3/4 Shell Helmet,Positive,11,2030,62,184.55,243
+PB0095,Review: Commencal's Meta Power SX Signature Packs a Punch for the Price,Positive,15,2883,32,192.2,240
+PB0096,Review: Sweet Protection Primer Mips Helmet,Positive,6,1011,32,168.5,219
+PB0097,Review: Motion Instruments System 2 Data Acquisition Kit,Positive,8,1522,147,190.25,239
+PB0098,Review: The New Marin Alpine Trail is More Adjustable &amp; Capable Than Ever,Positive,22,4421,182,200.95,235
+PB0099,Review: The Revel Rascal V2 is a Live Wire Trail Bike,Positive,14,2639,147,188.5,223
+PB0100,Review: 10 Months With Shimano's GE9 Gravity Shoes,Positive,5,892,138,178.4,196
+PB0101,"Check Out: Magnetic Glasses, Tacky Grips, Handguards, Protection From YT, &amp; More",Positive,8,1511,115,188.88,231
+PB0102,Review: One Year on the Liv Intrigue LT Advanced Pro 1,Positive,17,3336,159,196.24,226
+PB0103,Video: Welcome to Pinkbike's 2024 Value MTB Field Test,Positive,5,764,32,152.8,250
+PB0104,Review: Chromag Seton Pants and Dominion Jersey,Positive,5,921,165,184.2,195
+PB0105,Review: Wolf Tooth Components Ripsaw Aluminum Flat Pedals,Positive,8,1481,62,185.12,224
+PB0106,Value Field Test: Giant Stance - A Great Leap Forward,Positive,7,1353,177,193.29,239
+PB0107,Review: Forbidden Druid - Travel is Just a Number,Positive,19,3512,49,184.84,228
+PB0108,Review: Limar Livigno MIPS Lightweight Full Face Helmet,Positive,8,1626,180,203.25,244
+PB0109,Review: 7iDP's New Project 21 Open Face Helmet,Positive,4,760,180,190.0,201
+PB0110,Review: Push SV Eight Coil Shock,Positive,9,1721,84,191.22,237
+PB0111,Review: GasGas ECC 6 - More Speed Than You Need?,Mixed,16,3081,182,192.56,208
+PB0112,Review: Fast Suspension Ride E Shock,Positive,6,1124,116,187.33,208
+PB0113,Head to Head Review: 2025 RockShox Zeb vs Fox 38,Positive,10,1870,111,187.0,232
+PB0114,Review: Giant TRX Carbon Wheels,Positive,9,1783,183,198.11,228
+PB0115,Video: Scott Ransom vs Orbea Rallon - Which Lightweight Enduro Bike Is Best?,Mixed,11,1972,114,179.27,200
+PB0116,Review: 2024 Orbea Rallon - Enduro-er Than Ever,Positive,16,2971,103,185.69,214
+PB0117,Review: Norco Range VLT - The Purple Plow,Positive,13,2435,86,187.31,215
+PB0118,Review: Northwave Overland Plus Clipless Shoes,Positive,7,1239,52,177.0,221
+PB0119,Review: EXT's New Storia V4 Coil Shock,Positive,8,1523,180,190.38,211
+PB0120,Review: Giant Trance X Advanced - Not Your Parents' Volvo,Positive,17,3063,61,180.18,213
+PB0121,First Ride: Formula's New Josh Bryceland Edition Selva Fork,Mixed,6,1153,174,192.17,218
+PB0122,Review: The Norco Fluid VLT 140 is a Modest Overachiever,Positive,23,4516,161,196.35,239
+PB0123,DH Field Test: Intense M1 - For Your Gnarliest Trails,Positive,12,2246,138,187.17,207
+PB0124,Review: Canyon Lux Trail - Mellow Marathon Machine,Positive,14,2758,178,197.0,236
+PB0125,Review: Smith's Payroll Helmet Has Koroyd &amp; A Crash Sensor,Positive,6,1053,52,175.5,218
+PB0126,Review: Last Glen - An Out-of-the-Ordinary All-Mountain Bike,Positive,17,3266,150,192.12,232
+PB0127,Review: Canyon's New Tempr CFR Cross-Country Shoes,Positive,6,1146,185,191.0,204
+PB0128,Review: Mavic Deemax DH YLW - A Classic Downhill Wheelset,Positive,8,1464,119,183.0,209
+PB0129,Review: Forge+Bond Shift EM - A US-Made Carbon Wheelset for $1250,Positive,8,1435,98,179.38,202
+PB0130,"Review: The Airdrop Edit MX - No Frills, All Thrills",Mixed,19,3644,125,191.79,244
+PB0131,Video: Specialized Epic 8 vs Pinarello Dogma XC - World Cup &amp; Olympic Medal Winning Bikes Compared,Positive,14,2547,42,181.93,224
+PB0132,Review: Privateer 141 - The Adjustable Wrench of Trail Bikes,Positive,19,3638,164,191.47,229
+PB0133,Review: Pirelli Scorpion Race Enduro M &amp; T Tires,Mixed,6,1100,32,183.33,234
+PB0134,Review: Swagman Summit Vertical Hitch Rack,Mixed,7,1350,181,192.86,207
+PB0135,"The Good, the Bad, and the Ugly: What Grips Pinkbike Editors Actually Use",Mixed,8,1585,181,198.12,234
+PB0136,Review: Santa Cruz V10 - Hard to Ignore,Positive,12,2239,93,186.58,213
+PB0137,"Review: Devinci E-Troy Lite - Canadian Made, Reasonably Priced, &amp; Lots of Fun",Positive,21,4034,80,192.1,223
+PB0138,Review: Formula Nebbia Air Shock,Positive,10,1962,158,196.2,230
+PB0139,"Review: The Rocky Mountain Altitude C90 Has Impressive Grip &amp; Adjustability, But Isn't the Easiest to Work On",Mixed,20,3679,59,183.95,250
+PB0140,Review: Specialized Eliminator / Butcher Tires - Great Performance at a Reasonable Price,Positive,8,1569,160,196.12,239
+PB0141,Review: Industry Nine Solix M TR300/290 Carbon Wheels,Positive,9,1772,135,196.89,245
+PB0142,Review: USWE Riding Packs - Locked In With One Buckle,Positive,9,1682,88,186.89,239
+PB0143,Review: Fox Releases New Transfer Neo Wireless Dropper Post,Positive,9,1737,182,193.0,213
+PB0144,Review: The Raaw Jibb LT is Sure-Footed &amp; Versatile,Positive,21,3955,62,188.33,233
+PB0145,Review: The Adventure Dog Channel - Training the Ultimate Trail Dog,Positive,12,2331,129,194.25,242
+PB0146,Review: Atherton S.170 - All Action Subtraction,Positive,18,3404,164,189.11,208
+PB0147,Review: Ride Concepts Accomplice BOA Flat Pedal Shoes,Positive,6,1158,181,193.0,217
+PB0148,Review: 1Up Super Duty Hitch Rack,Positive,7,1278,84,182.57,216
+PB0149,Review: FSA's New KFX i28 XC Carbon Wheels are Compliant &amp; Comfortable,Positive,4,698,103,174.5,204
+PB0150,"Review: YT Decoy SN MX Core 4 CF – Less Power, More Handling",Positive,29,5611,147,193.48,246
+PB0151,Review: Zoceli Narum - A Czech-Made Steel Trail Bike,Positive,12,2222,110,185.17,218
+PB0152,Review: The Yeti SB165 Is Still a Pedalable Park Bike,Positive,15,2956,183,197.07,209
+PB0153,Review: The Forbidden Dreadnought V2 Has a Need for Speed,Positive,19,3653,151,192.26,232
+PB0154,Review: WTB's Revised Tough Casing Tires,Positive,7,1269,115,181.29,202
+PB0155,First Ride: 2025 Rocky Mountain Element,Positive,6,1102,106,183.67,240
+PB0156,Review: Vivo Enduro Derailleur &amp; F3 Shifter,Positive,8,1381,32,172.62,214
+PB0157,Review: Cannondale Moterra SL - Full Power Without All the Weight,Positive,23,4447,134,193.35,246
+PB0158,Review: Orange Switch 7 - A Clashing of Worlds,Positive,16,3133,177,195.81,249
+PB0159,Review: 6 of the Latest &amp; Greatest Downhill Full-Face Helmets,Mixed,14,2689,146,192.07,230
+PB0160,Review: Propain Sresh CF - Mild-Mannered Middle Ground,Positive,18,3283,52,182.39,211
+PB0161,Review: Modifying the TRP DH-R Evo Brakes with Aftermarket Levers,Positive,6,1048,78,174.67,200
+PB0162,Video: Welcome to the 2025 Trail Bike Field Test,Positive,7,1140,32,162.86,250
+PB0163,Review: Silt's $400 Enduro Alloy Wheelset,Positive,6,1111,152,185.17,207
+PB0164,Field Test Review: 2025 Specialized Stumpjumper 15 Alloy,Positive,8,1481,166,185.12,199
+PB0165,Field Test: Rocky Mountain Instinct - Geometry Vs. Suspension?,Mixed,8,1588,182,198.5,237
+PB0166,Review: Roval Control Alloy 350 6B XC Wheels,Positive,5,855,83,171.0,198
+PB0167,"Field Test: Spot Mayhem 140 - Conservative Geo, Liberal Amounts of Fun",Mixed,10,1742,52,174.2,209
+PB0168,Field Test Bonus: Can We Unlock the Rocky Mountain Instinct's Potential?,Mixed,4,746,182,186.5,191
+PB0169,Review: 2025 Trek Top Fuel - More Capable &amp; Adaptable Than Ever,Positive,15,2890,85,192.67,241
+PB0170,Review: The Arctos Epic is a Unique High-Volume Hip Pack,Mixed,8,1515,126,189.38,215
+PB0171,"Review: Kona Process 153 - Predictable, Rewarding, &amp; Sharp",Positive,14,2668,180,190.57,218
+PB0172,Review: Mavic Deemax Pro Mips Helmet,Positive,6,1141,125,190.17,220
+PB0173,Review: Schwalbe's Shredda Gravity Tires are a Loamer Cheat Code,Positive,9,1597,101,177.44,197
+PB0174,Review: Rab Cinder Crimp Jersey &amp; Kinetic Waterproof Pants,Positive,7,1302,180,186.0,194
+PB0175,"Video - Pinkbike Awards Winners: Bike, Innovations &amp; More",Positive,1,200,200,200.0,200
+PB0176,Review: Trek's 2025 Slash+ 9.9 is a Ridiculously Good Descender,Positive,17,3203,78,188.41,242
+PB0177,Review: Pademelon CS.1 Steering Damper,Positive,9,1715,124,190.56,246
+PB0178,Review: Fox Purevue Goggles - A Compromised Crossover,Positive,6,1063,114,177.17,201
+PB0179,"Review: The Orucase B2 MTB is Tiny, but Not For Everyone",Mixed,8,1463,29,182.88,244
+PB0180,"Review: Cannondale's 2025 Scalpel 1 is a Capable, Modern XC Bike",Positive,18,3520,151,195.56,226
+PB0181,Review: Formula Cura X Brakes - 2 Piston Consistency,Positive,7,1257,32,179.57,246
+PB0182,Review: Turnon Bunker Dropper Post,Positive,7,1244,113,177.71,196
+PB0183,Review: Haro Greer Alloy LTD 2,Mixed,13,2546,162,195.85,243
+PB0184,Review: Fox's New Speedframe RS is Virginia Tech's Top Rated Helmet,Positive,7,1301,136,185.86,208
+PB0185,Review: Scor 6080Z - Ready to Run Over Anything,Positive,17,3326,149,195.65,245
+PB0186,Review: Orbea's 2025 Wild eMTB Gets a Quiet Update,Positive,15,2957,158,197.13,248
+PB0187,5 eMTB Motors Ridden &amp; Rated for 2025: Bosch vs DJI vs Shimano vs SRAM vs Specialized,Positive,24,4275,7,178.12,250
+PB0188,Review: The SR Suntour Durolux 38 EVO Fork is a Budget Performer,Positive,12,2233,62,186.08,224
+PB0189,Review: XFusion's New Vengeance 38 Fork,Positive,8,1602,183,200.25,246
+PB0190,Review: Vorsprung Telum Coil Shock - Canadian Made &amp; Custom Tuned,Positive,8,1573,156,196.62,230
+PB0191,Review: Industry Nine Hydra 2 Hubs - 870 Points of Engagement &amp; Increased Durability,Positive,8,1611,184,201.38,243
+PB0192,Review: MET's New Revo MIPS Helmet,Positive,8,1518,168,189.75,219
+PB0193,"Review: Saris' New Edge 2"" Hitch Rack",Positive,7,1355,133,193.57,216
+PB0194,Review: 6 Clipless Trail / DH Mountain Bike Shoes Ridden &amp; Rated,Mixed,18,3470,47,192.78,241
+PB0195,Review: Transition's New Regulator CX eMTB,Positive,18,3312,32,184.0,217
+PB0196,Review: Khyber V1 Multi-Pivot Bike Rack,Positive,12,2193,52,182.75,235
+PB0197,Review: Chris King's New US-Made MTN30 Aluminum Wheels,Positive,8,1409,86,176.12,201
+PB0198,Review: SRAM's New Eagle 90 Mechanical Transmission - No Batteries Required,Positive,10,1810,32,181.0,217
+PB0199,Review: Polygon Collosus DH-R - Smooth &amp; Sensibly Priced,Mixed,17,3101,52,182.41,226
+PB0200,Review: The New Pivot Firebird  is Well Balanced &amp; Refined,Positive,19,3527,47,185.63,247
+PB0201,Review: 6D's New Alterra Enduro Full Face Helmet,Positive,7,1341,180,191.57,199
+PB0202,"Review: Specialized's New Turbo Levo 4 Has More Power, More Battery",Positive,22,4085,32,185.68,234
+PB0203,Review: Salsa's New Spearfish - The Bright Green Race Machine,Positive,14,2668,131,190.57,225
+PB0204,Review: Amflow PL Carbon Pro eMTB - Blitzing Trails &amp; Bending Rules,Positive,25,4621,77,184.84,245
+PB0205,Review: Hunt's Wallet-Friendly XC Wide Alloy Wheels,Positive,7,1243,87,177.57,215
+PB0206,Review: The Kona Process 134 CR DL is a Comfort Zone Companion,Mixed,19,3576,136,188.21,216
+PB0207,Review: Commencal Meta Power SX 400 - A Particular Flavor of eMTB Spice,Positive,16,3071,130,191.94,218
+PB0208,Review: FSA Gradient i30 Carbon Wheels - Stiff &amp; Strong,Positive,7,1197,88,171.0,198
+PB0209,Review: Pivot Phoenix - Easily Accessible DH Speed,Positive,16,2943,122,183.94,217
+PB0210,Review: The CounterSycle Tuned Mass Damper,Mixed,11,2104,176,191.27,211
+PB0211,Review: Propain Spindrift 5 CF,Positive,15,2872,132,191.47,220
+PB0212,Review: Santa Cruz Vala - The VPP-Free eMTB,Positive,15,2922,100,194.8,237
+PB0213,Review: 2025 Forestal Siryon - Balanced Handling With Some Practical Pitfalls,Mixed,13,2567,154,197.46,248
+PB0214,Review: Yeti MTe - A Mid-Power Contender with TQ's New HPR60 Motor,Positive,26,5039,108,193.81,238
+PB0215,Review: Shimano XTR 9220 Brakes - Rebuilt for Refinement,Positive,10,1903,97,190.3,241
+PB0216,Review: Shimano's XTR Drivetrain Finally Goes Wireless,Positive,14,2715,180,193.93,210
+PB0217,Review: WRP Zero Drag Hub Internal Kit,Positive,8,1515,146,189.38,209
+PB0218,Review: Magped's Magnetic Flat Pedals Attempt to Bridge the Gap,Mixed,7,1425,184,203.57,248
+PB0219,Review: The Liv Pique Advanced 29 is a Thoroughbred XC Race Bike,Positive,23,4452,170,193.57,249
+PB0220,Review: SRAM Maven Base Brakes - Light Lever Action &amp; Lots of Power,Mixed,8,1567,180,195.88,218
+PB0221,"Review: Fox Podium Fork - Heavy, Expensive, Upside-Down, &amp; Excellent",Mixed,15,2746,74,183.07,205
+PB0222,Review: The ARC8 Evolve FS Pushes the Boundaries of XC,Positive,15,2774,78,184.93,207
+PB0223,Review: OneUp Clip Pedals,Positive,7,1381,173,197.29,234
+PB0224,Review: The Pivot Trailcat LT Untangles the Tech,Positive,17,3325,183,195.59,216
+PB0225,Review: 2025 Santa Cruz Bullit eMTB,Positive,21,4069,181,193.76,214
+PB0226,Review: Schwalbe's Magic Mary Radial Tires Deliver Top Notch Traction,Positive,9,1683,113,187.0,216
+PB0227,Review: 2026 Trek Fuel LX / MX - The Secret Menu Option,Positive,17,3184,32,187.29,234
+PB0228,Review: Giro's New Montaro III Helmet,Positive,5,800,32,160.0,210
+PB0229,Review: Chromag's New Mid-Travel Reazon is a Singletrack Steamroller,Positive,16,3003,92,187.69,220
+PB0230,Review: POC's Cularis Helmet Takes Virginia Tech's Top Spot,Positive,4,749,140,187.25,228
+PB0231,"Review: 2025 Knolly Warden - Pushing the Limits of Long, Low, &amp; Slack",Positive,18,3388,79,188.22,218
+PB0232,Review: Virginia Tech's Top 10 Safest MTB Helmets Ridden &amp; Rated,Positive,20,3863,183,193.15,218
+PB0233,Review: OneUp V3 Dropper Post - Still the One to Beat,Positive,7,1260,47,180.0,236
+PB0234,Review: 2025 Kona Hei Hei G10,Positive,15,2798,78,186.53,231
+PB0235,Review: 5 Anti-Kickback / Chainslap Devices Ridden &amp; Rated,Mixed,16,3130,131,195.62,231
+PB0236,Review: The DT Swiss DEG DF Anti-Pedal Kickback Hub Upgrade is Smartly Designed,Positive,9,1764,142,196.0,231
+PB0237,Review: Rossignol Heretic - Second Time's the Charm,Positive,16,2887,117,180.44,198
+PB0238,Review: Leatt's $319 USD CeraMag All-Mtn 8.0 Ti Flat Pedals,Positive,8,1395,40,174.38,203
+PB0239,Review: Hunt Proven Trail Carbon H-Core Wheelset,Positive,8,1361,52,170.12,206
+PB0240,"Review: The £1,500 Calibre Bossnut - Why Pay More?",Positive,15,2887,143,192.47,238
+PB0241,Review: The O'Neal Trailfinder Helmet With Quin Sensor Can Call For Help If You Hit Your Head,Mixed,11,1960,47,178.18,214
+PB0242,Review: KOM Xeno Hubs - Reinventing The Wheel,Mixed,14,2487,47,177.64,233
+PB0243,Review: Apogee One - Cutting Edge Compliance,Positive,17,3222,135,189.53,242
+PB0244,Review: Maxxis' New Dissector Tire is Fast &amp; Versatile,Positive,7,1364,182,194.86,219
+PB0245,Review: 7 of the Best Hydration Vests Ridden &amp; Rated,Positive,15,2985,175,199.0,237
+PB0246,Video: Do You Really Need DH Casing Tires?,Mixed,5,901,137,180.2,201
+PB0247,Review: Fox Union All Weather Flat Shoes -  For the Wettest Days,Positive,7,1324,180,189.14,204
+PB0248,Review: Orbea Rallon DH - A Recipe For Locking Into Turns,Positive,16,3042,160,190.12,226
+PB0249,Review: Lazer’s New Impala KinetiCore Helmet,Positive,6,1126,124,187.67,225
+PB0250,Review: Push Nine One V2 Inverted Fork - Plush &amp; Pricey,Positive,12,2298,168,191.5,214
+PB0251,Review: Cane Creek's Free Shock Tuner App,Positive,8,1526,167,190.75,226
+PB0252,Review: Kavenz VHP16 - The Commenter's Dream Bike,Positive,20,3871,182,193.55,211
+PB0253,Review: Orbea's 2026 Rallon Enduro Proves Long-Travel Enduro Bikes Aren't Dead,Positive,21,3898,126,185.62,205
+PB0254,Review: Every Pair of MTB Shoes I've Worn This Year,Positive,18,3583,181,199.06,250
+PB0255,Review: EXT Arma V4 - One of the Best Shocks Gets Even Better,Positive,10,1917,180,191.7,213
+PB0256,"Review: Fair Bicycle's Drop Best Offset Saddle Clamp Looks Weird, Works Great",Positive,7,1312,124,187.43,219
+PB0257,Review: The 2026 Norco Revolver 130 is Ready for Modern XC Riding,Positive,16,3181,139,198.81,247
+PB0258,Propain Sresh SL Review: A Mid-Power eMTB That Doesn’t Ride Like a Tank,Positive,21,3871,52,184.33,232
+PB0259,The New Orbea Rallon RS Almost Isn't An eMTB. Is That What Riders Want?,Positive,18,3451,145,191.72,210
+PB0260,"Check Out: Lighter, Grippy Tires, Wet-Weather Gear, Coffee in a Tube, &amp; More",Mixed,9,1736,180,192.89,220
+PB0261,"Shimano XT Di2 Review: Great Shifting, But Where’s the Clutch?",Mixed,11,2039,123,185.36,196
+PB0262,Review: Formula Selva V – Are 35mm Stanchions Still Enough for Enduro?,Mixed,12,2307,131,192.25,247
+PB0263,Staff Rides: Seb Stott’s Pivot Firebird,Positive,10,1723,47,172.3,210
+PB0264,Review: Norco's New Sight VLT TQ - High-Pivot Meets Mid-Power,Positive,16,3008,32,188.0,242
+PB0265,Review: The New Transition Spur is Lightly Revised and Still Just as Fun,Positive,16,2988,32,186.75,240
+PB0266,"FlexStab Review: A Handlebar With Ball-Jointed, Floating Grips",Mixed,9,1536,47,170.67,202
+PB0267,Review: The Revel Ritual Blends Enduro Bike Numbers With Trail Bike Handling,Positive,19,3456,38,181.89,218
+PB0268,TRP EVO Pro Brake Review: The 'Set and Forget' Favorite Now Has More Adjustability,Positive,6,1103,160,183.83,195
+PB0269,"Magura Gustav Brake Review: Plenty of Power, It's Just Not Immediately Available",Mixed,7,1317,150,188.14,208
+PB0270,"Lewis LHP+ U4 Brake Review: All Bark, No Bite?",Mixed,6,1034,52,172.33,205
+PB0271,Review: After 13 Years Shimano’s Saint Brakes Are Still on Top for Outright Power,Positive,5,978,185,195.6,219
+PB0272,Hayes Dominion A4 Brake Review: Ultra-Light Lever Action and Plenty of Power,Positive,6,1155,173,192.5,208
+PB0273,Review: Shimano XTR 9220 Brakes - Consistency is Key,Positive,6,1105,149,184.17,200
+PB0274,SRAM Maven Brake Review: The Current Benchmark for Accessible Power,Positive,6,1156,180,192.67,223
+PB0275,Review: Trickstuff's Maxima Brakes Are Fancy and Finicky,Mixed,5,978,180,195.6,230
+PB0276,Review: Hope Tech 4 V4 Brakes - Strong and Sensitive,Positive,7,1278,134,182.57,200
+PB0277,Can MTB Brakes Stop a Honda Fit? We Tested 10 Four-Piston MTB Brakes,Positive,12,2230,93,185.83,212
+PB0278,Review: FSA NS SC i30 Carbon Wheels,Positive,6,1051,141,175.17,198
+PB0279,Trek Fuel EX+ Review: The Mid-Power eMTB That’ll Make Most Riders Happy,Positive,18,3349,130,186.06,219
+PB0280,Intrusive Thoughts: The Hudski Dualist - Is This a Mountain Bike?,Mixed,10,1941,137,194.1,233
+PB0281,Review: 2026 Devinci Spartan - A Canadian-Made Aluminum Beast,Positive,15,2836,137,189.07,231
+PB0282,Scott Gambler RC Review: A Race-Ready DH Bike That's Easy to Live With,Positive,19,3354,52,176.53,220
+PB0283,Review: EXT Vecta Coil Shock - Boutique Suspension at a Lower Price,Positive,8,1442,52,180.25,220
+PB0284,Review: Vessel Bike Project Enduro - Custom Geo and a High-Pivot Steel Frame,Positive,17,3153,79,185.47,211
+PB0285,The Crankbrothers Stamp EVO is a Comically Large Flat Pedal,Positive,6,1006,73,167.67,194
+PB0286,Allied Fitz Review: The XC Rider's Trail Bike?,Positive,14,2569,32,183.5,229
+PB0287,6D ATB-3: A $769 DH Helmet That Can Be Repaired After a Crash (Sometimes),Mixed,8,1521,180,190.12,214
+PB0288,"The Good, The Bad &amp; The Ugly: Pinkbike Tech Editors' Preferred Handlebars",Mixed,15,2875,181,191.67,212
+PB0289,"Review: The EXT Vaia USD Fork is Extra Adjustable, But Lacks Consistency",Positive,14,2665,155,190.36,244
+PB0290,Review: One Year With the High-Pivot Canyon Sender CFR DH Bike - Fast &amp; Refined,Positive,17,3274,136,192.59,223
+PB0291,Review: 2026 Propain Tyee Trail - Does Less Travel Really Make a Difference?,Positive,15,2889,140,192.6,231
+PB0292,Canfield Lithium V3 Review: Long Travel Without the Lethargy,Positive,16,3042,160,190.12,202
+PB0293,"Review: Shimano XT 8220 Brakes - More Consistency, Same Value",Positive,12,2283,182,190.25,207
+PB0294,Review: Sidi Dominator X Shoes - A Tougher Take on XC Footwear,Positive,7,1234,88,176.29,201
+PB0295,Review: The Forbidden Reya Throws Conventional XC Geometry Out the Window,Positive,18,3481,180,193.39,241
+PB0296,Review: Sour Bicycles Double Choc - Exotic Normal,Positive,12,2283,131,190.25,215
+PB0297,Chromag Throwdown Review: Too Slack or Just Right?,Mixed,17,3094,104,182.0,224
+PB0298,Review: Berd Hawk 30 Gold Wheels – Ultra-Light and Subtly Forgiving,Positive,6,1182,182,197.0,222
+PB0299,Review: Stinner Romero MT - A US-Made Steel Trail Bike That's Better With Mixed Wheels,Positive,15,2884,150,192.27,214
+PB0300,Review: Yeti Goes Long With the Ultra-Adjustable LT,Mixed,25,4827,124,193.08,228
+PB0301,Oak Components Levers Claim Increased Power for Hope Tech 4 V4 Brakes,Mixed,4,790,183,197.5,232

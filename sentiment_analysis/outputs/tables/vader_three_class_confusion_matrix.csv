@@ -1,0 +1,4 @@
+,predicted_Negative,predicted_Mixed,predicted_Positive
+actual_Negative,0,0,1
+actual_Mixed,0,0,60
+actual_Positive,4,0,236
