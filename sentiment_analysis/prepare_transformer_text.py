@@ -14,9 +14,6 @@ The chunks are not treated as manually labeled observations. Manual sentiment
 remains an article-level ground-truth label and is included only so the chunks
 can later be aggregated and evaluated by article.
 
-AI Use:
-AI tools were used to assist with code design, documentation, and workflow
-planning.
 """
 
 from pathlib import Path
@@ -25,9 +22,7 @@ import re
 import pandas as pd
 
 
-# ---------------------------------------------------------------------------
 # Project paths
-# ---------------------------------------------------------------------------
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 
@@ -45,9 +40,7 @@ OUTPUT_FILE = OUTPUT_DIR / "review_text_chunks.csv"
 ARTICLE_SUMMARY_FILE = OUTPUT_DIR / "review_chunk_summary.csv"
 
 
-# ---------------------------------------------------------------------------
 # Chunking settings
-# ---------------------------------------------------------------------------
 
 # The target length encourages coherent but reasonably compact chunks.
 TARGET_CHUNK_WORDS = 180
@@ -59,9 +52,7 @@ MAX_CHUNK_WORDS = 250
 MIN_CHUNK_WORDS = 30
 
 
-# ---------------------------------------------------------------------------
 # Dataset fields
-# ---------------------------------------------------------------------------
 
 REQUIRED_COLUMNS = [
     "article_id",

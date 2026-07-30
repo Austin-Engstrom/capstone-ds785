@@ -18,10 +18,6 @@ Three-class labels:
 Binary modeling labels:
 - Positive
 - Not Positive
-
-AI Use:
-AI tools were used to assist with code design, documentation, and workflow
-planning.
 """
 
 from pathlib import Path
@@ -43,9 +39,7 @@ from sklearn.metrics import (
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
 
-# ---------------------------------------------------------------------------
 # Project paths
-# ---------------------------------------------------------------------------
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 
@@ -107,9 +101,7 @@ BINARY_CONFUSION_FIGURE = (
 )
 
 
-# ---------------------------------------------------------------------------
 # Model settings
-# ---------------------------------------------------------------------------
 
 POSITIVE_THRESHOLD = 0.05
 NEGATIVE_THRESHOLD = -0.05
