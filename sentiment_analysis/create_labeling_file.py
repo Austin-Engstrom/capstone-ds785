@@ -14,9 +14,6 @@ Label definitions:
   caveats, or no clearly dominant positive or negative conclusion.
 - Negative: Weaknesses clearly outweigh strengths and the overall recommendation
   is unfavorable.
-
-AI Use:
-AI tools were used to assist with code design, documentation, and workflow planning.
 """
 
 from pathlib import Path

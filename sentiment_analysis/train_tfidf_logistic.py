@@ -13,10 +13,6 @@ This script:
 7. Extracts interpretable feature coefficients.
 8. Saves predictions, misclassifications, metrics, CV results, tables,
    figures, and the fitted model pipeline.
-
-AI Use:
-AI tools were used to assist with code design, documentation, and workflow
-planning.
 """
 
 from pathlib import Path
@@ -51,10 +47,7 @@ from sklearn.model_selection import (
 )
 from sklearn.pipeline import Pipeline
 
-
-# ---------------------------------------------------------------------------
 # Project paths
-# ---------------------------------------------------------------------------
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 
@@ -157,9 +150,7 @@ LEARNING_CURVE_FIGURE = (
     / "tfidf_logistic_learning_curve.png"
 )
 
-# ---------------------------------------------------------------------------
 # Modeling settings
-# ---------------------------------------------------------------------------
 
 RANDOM_STATE = 42
 TEST_SIZE = 0.20
@@ -179,10 +170,7 @@ VALID_MANUAL_LABELS = {
     "Negative",
 }
 
-
-# ---------------------------------------------------------------------------
 # Data preparation
-# ---------------------------------------------------------------------------
 
 def load_labeled_reviews() -> pd.DataFrame:
     """
@@ -393,10 +381,7 @@ def prepare_modeling_data(
     )
     return prepared
 
-
-# ---------------------------------------------------------------------------
 # Model construction and tuning
-# ---------------------------------------------------------------------------
 
 def create_pipeline() -> Pipeline:
     """
@@ -501,10 +486,7 @@ def perform_grid_search(
 
     return grid_search
 
-
-# ---------------------------------------------------------------------------
 # Evaluation
-# ---------------------------------------------------------------------------
 
 def calculate_test_metrics(
     y_test: pd.Series,
@@ -721,10 +703,7 @@ def create_prediction_output(
 
     return output
 
-
-# ---------------------------------------------------------------------------
 # Feature importance
-# ---------------------------------------------------------------------------
 
 def extract_feature_importance(
     fitted_pipeline: Pipeline,
@@ -796,10 +775,7 @@ def extract_feature_importance(
         not_positive_features,
     )
 
-
-# ---------------------------------------------------------------------------
 # Figures
-# ---------------------------------------------------------------------------
 
 def save_confusion_matrix_outputs(
     y_test: pd.Series,
@@ -1157,10 +1133,7 @@ def save_learning_curve(
 
     plt.close(figure)
 
-
-# ---------------------------------------------------------------------------
 # Output handling
-# ---------------------------------------------------------------------------
 
 def create_output_directories() -> None:
     """
@@ -1288,10 +1261,7 @@ def save_classification_report(
 
     return report_df
 
-
-# ---------------------------------------------------------------------------
 # Main workflow
-# ---------------------------------------------------------------------------
 
 def main() -> None:
     """

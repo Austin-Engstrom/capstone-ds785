@@ -1,5 +1,5 @@
 """
-EDA summary script for DS 785 Presentation 3.
+EDA summary script
 
 Generates:
 - dataset overview

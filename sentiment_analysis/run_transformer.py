@@ -25,9 +25,6 @@ The transformer Neutral class is mapped to Mixed for article-level comparison.
 This mapping is necessary for evaluation but should not be interpreted as an
 exact conceptual equivalence.
 
-AI Use:
-AI tools were used to assist with code design, documentation, and workflow
-planning.
 """
 
 from pathlib import Path
@@ -56,9 +53,7 @@ from transformers import (
 )
 
 
-# ---------------------------------------------------------------------------
 # Project paths
-# ---------------------------------------------------------------------------
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 
@@ -131,9 +126,7 @@ BINARY_CONFUSION_FIGURE = (
 )
 
 
-# ---------------------------------------------------------------------------
 # Model and inference settings
-# ---------------------------------------------------------------------------
 
 MODEL_NAME = (
     "cardiffnlp/"
@@ -162,9 +155,7 @@ BINARY_LABELS = [
 ]
 
 
-# ---------------------------------------------------------------------------
 # Data loading and validation
-# ---------------------------------------------------------------------------
 
 def load_text_chunks() -> pd.DataFrame:
     """
@@ -283,10 +274,7 @@ def validate_input_data(chunks: pd.DataFrame) -> None:
             + ", ".join(sorted(invalid_manual_labels))
         )
 
-
-# ---------------------------------------------------------------------------
 # Device and model loading
-# ---------------------------------------------------------------------------
 
 def select_device() -> torch.device:
     """
@@ -432,10 +420,7 @@ def get_model_label_mapping(
 
     return standardized_mapping
 
-
-# ---------------------------------------------------------------------------
 # Resume and checkpoint support
-# ---------------------------------------------------------------------------
 
 def load_existing_predictions() -> pd.DataFrame:
     """
@@ -565,10 +550,7 @@ def save_chunk_checkpoint(
 
     return combined
 
-
-# ---------------------------------------------------------------------------
 # Transformer inference
-# ---------------------------------------------------------------------------
 
 def format_duration(
     seconds: float,
@@ -938,10 +920,7 @@ def run_transformer_inference(
 
     return completed_predictions
 
-
-# ---------------------------------------------------------------------------
 # Article aggregation
-# ---------------------------------------------------------------------------
 
 def map_transformer_label_to_project_label(
     transformer_label: str,
@@ -1186,10 +1165,7 @@ def aggregate_article_predictions(
 
     return article_predictions
 
-
-# ---------------------------------------------------------------------------
 # Evaluation
-# ---------------------------------------------------------------------------
 
 def calculate_metrics(
     actual: pd.Series,
@@ -1418,10 +1394,7 @@ def save_confusion_matrix_figure(
 
     plt.close(figure)
 
-
-# ---------------------------------------------------------------------------
 # Output creation
-# ---------------------------------------------------------------------------
 
 def save_evaluation_outputs(
     article_predictions: pd.DataFrame,
@@ -1733,10 +1706,7 @@ def print_results_summary(
         f"{BINARY_CONFUSION_FIGURE}"
     )
 
-
-# ---------------------------------------------------------------------------
 # Main workflow
-# ---------------------------------------------------------------------------
 
 def main() -> None:
     """
